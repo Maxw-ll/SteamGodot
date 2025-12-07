@@ -1,0 +1,80 @@
+[gd_scene load_steps=2 format=3 uid="uid://tki0e12u0q4q"]
+
+[ext_resource type="Script" uid="uid://b321raskrsc6q" path="res://Menu.gd" id="1_uubjt"]
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_uubjt")
+
+[node name="LineEdit" type="LineEdit" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -160.0
+offset_top = -10.0
+offset_right = 158.0
+offset_bottom = 21.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="join" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 6.0
+offset_top = -62.0
+offset_right = 57.0
+offset_bottom = -31.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "JOIN
+"
+
+[node name="host" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -52.0
+offset_top = -60.0
+offset_right = -1.0
+offset_bottom = -29.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "HOST"
+
+[node name="RichTextLabel" type="RichTextLabel" parent="."]
+custom_minimum_size = Vector2(0, 150)
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -263.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="LineEdit2" type="LineEdit" parent="."]
+visible = false
+layout_mode = 0
+offset_left = 894.0
+offset_top = 614.0
+offset_right = 1151.0
+offset_bottom = 645.0
+text = "LOBBY: "
+
+[connection signal="pressed" from="join" to="." method="_on_join_pressed"]
+[connection signal="pressed" from="host" to="." method="_on_host_pressed"]
