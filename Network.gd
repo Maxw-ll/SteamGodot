@@ -11,16 +11,32 @@ func _ready() -> void:
 	Steam.connect("lobby_created", Callable(self, "_on_lobby_created"))
 	Steam.connect("lobby_joined", Callable(self, "_on_lobby_joined"))
 	Steam.connect("lobby_chat_update", Callable(self, "_on_data_update"))
-	#Steam.connect("lobby_chat_update", Callable(self, "_on_lobby_chat_message"))
+	Steam.connect("lobby_message", Callable(self, "_on_lobby_chat_message"))
+
+	Steam.lobby_match_list.connect(show_lobby_list)
+
+	_open_lobby_list()
 	
-func _on_lobby_chat_message(_lobby_id, _user, message, _type):
-	Console.log("Mensagem recebida do JOIN: " + message)
+func _on_lobby_chat_message(_lobby_id: int, _user: int, message: String, _chat_type: int):
+	Console.log("Mensagem recebida de " + Steam.getFriendPersonaName(_user) + " : " + message)
 
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
 	Steam.run_callbacks()
 
+
+func _open_lobby_list():
+	Steam.addRequestLobbyListDistanceFilter(Steam.LOBBY_DISTANCE_FILTER_WORLDWIDE)
+	Steam.requestLobbyList()
+
+
+func show_lobby_list(lobbies):
+
+	for lb in lobbies:
+		var lobby_name: String = Steam.getLobbyData(lb, "name")
+		var numMembers = Steam.getNumLobbyMembers(lb)
+		Console.log(str(lb) + " " + lobby_name +": " + str(numMembers))
 
 func _on_lobby_joined(lobby_id, permissions, locked, response):
 	lol_id = lobby_id
@@ -30,20 +46,21 @@ func _on_lobby_joined(lobby_id, permissions, locked, response):
 	Console.log("[JOIN] Locked = " + str(locked))
 	var nm = Steam.getLobbyData(lobby_id, "name")
 	Console.log("Entrei no LOBBY de "+ str(nm))
+
 	
 	
 	
 func send_message(mdg: String):
-	Console.log("Mensagem foi ennviada!")
+	Console.log("Mensagem foi enviada!")
 	Steam.sendLobbyChatMsg(lol_id, mdg)
 	
-func _on_data_update(lobby_id, _member_id):
+func _on_data_update(lobby_id: int, _changed_id: int, _making_change_id: int, _chat_state: int):
 	Console.log("[HOST] lobby_data_update disparou!")
 	Console.log("Player in Lobby: " + str(Steam.getNumLobbyMembers(lobby_id)))
 	
 	for i in range(Steam.getNumLobbyMembers(lobby_id)):
-		var player = Steam.getLobbyMemberByIndex(lobby_id, i)
-		Console.log(" - Player SteamID" + str(player))
+		var player = Steam.getFriendPersonaName(Steam.getLobbyMemberByIndex(lobby_id, i))
+		Console.log(" - Player SteamID" + player)
 
 	
 	
@@ -67,7 +84,7 @@ func initialize_steam():
 
 func create_lobby(max_players := 4):
 	Console.log("Criando Lobby...")
-	Steam.createLobby(Steam.LOBBY_TYPE_FRIENDS_ONLY, max_players)
+	Steam.createLobby(Steam.LOBBY_TYPE_PUBLIC, max_players)
 
 
 func enter_lobby(id):

@@ -29,6 +29,10 @@ func _on_lobby_create_mx(id):
 	lobby.text += id
 	lobby_id = int(id)
 	lobby.visible = true
+	var scene = load("res://Chat.tscn")
+	var instance = scene.instantiate()
+	add_child(instance)
+
 
 func _on_join_pressed() -> void:
 	lobby_id = int(line_edit.text)

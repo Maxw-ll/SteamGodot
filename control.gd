@@ -7,3 +7,4 @@ extends Control
 func _on_button_pressed() -> void:
 	var text = text_edit.text
 	Network.send_message(text)
+	text_edit.clear()

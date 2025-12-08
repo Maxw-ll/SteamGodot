@@ -66,6 +66,7 @@ anchor_bottom = 1.0
 offset_top = -263.0
 grow_horizontal = 2
 grow_vertical = 0
+scroll_following = true
 
 [node name="LineEdit2" type="LineEdit" parent="."]
 visible = false
