@@ -3,6 +3,9 @@ extends CharacterBody2D
 
 var speed := 500
 
+func  _ready() -> void:
+    ready.emit()
+
 func _physics_process(_delta):
     if not is_multiplayer_authority():
         return # Só controla o próprio player

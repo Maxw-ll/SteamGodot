@@ -1,7 +1,12 @@
 extends Node
 
+var is_host: bool = false
+
 var app_id: String = "480"
 signal lobby_createee(id)
+signal lobby_createdd
+signal lobby_joinedd
+var my_id
 
 var lol_id: int
 # Called when the node enters the scene tree for the first time.
@@ -14,6 +19,7 @@ func _ready() -> void:
 	Steam.connect("lobby_message", Callable(self, "_on_lobby_chat_message"))
 
 	Steam.lobby_match_list.connect(show_lobby_list)
+	my_id = Steam.getSteamID()
 
 	_open_lobby_list()
 	
@@ -46,6 +52,14 @@ func _on_lobby_joined(lobby_id, permissions, locked, response):
 	Console.log("[JOIN] Locked = " + str(locked))
 	var nm = Steam.getLobbyData(lobby_id, "name")
 	Console.log("Entrei no LOBBY de "+ str(nm))
+	if Steam.getLobbyOwner(lobby_id) == Steam.getSteamID():
+		# We're probably hosting so we can ignore this
+		print("Sou o dono")
+		return
+	var peer = SteamMultiplayerPeer.new()
+	peer.connect_to_lobby(lobby_id)
+	multiplayer.multiplayer_peer = peer
+	emit_signal("lobby_joinedd")
 
 	
 	
@@ -98,6 +112,10 @@ func _on_lobby_created(success, lobby_id):
 	emit_signal("lobby_createee", str(lobby_id))
 	Steam.setLobbyData(lobby_id, "name", str(Steam.getPersonaName(), "SABYS's LOBBY"))
 	#Steam.setLobbyJoinable(lobby_id, true)
+	var peer = SteamMultiplayerPeer.new()
+	peer.host_with_lobby(lobby_id)
+	multiplayer.multiplayer_peer = peer
+	emit_signal("lobby_createdd")
 	Console.log("Lobby ID real: " + str(lobby_id))
 		
 func verifiy_friends():
@@ -110,7 +128,3 @@ func verifiy_friends():
 		var steam_id: int = Steam.getFriendByIndex(i, Steam.FRIEND_FLAG_IMMEDIATE)
 		var friend_name: String = Steam.getFriendPersonaName(steam_id)
 		Console.log(friend_name)
-
-		
-	
-		

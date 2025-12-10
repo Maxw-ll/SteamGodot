@@ -11,7 +11,10 @@ var lobby_id: int
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	Network.connect("lobby_createee", Callable(self, "_on_lobby_create_mx"))
+	Network.connect("lobby_createdd", Callable(self, "on_loby_finished_created"))
+	Network.connect("lobby_joinedd", Callable(self, "on_lobby_finished_joined"))
 	Console.connect("log_msg", Callable(self, "_on_log"))
+
 	
 	Network.verifiy_friends()
 
@@ -29,10 +32,18 @@ func _on_lobby_create_mx(id):
 	lobby.text += id
 	lobby_id = int(id)
 	lobby.visible = true
-	var scene = load("res://Chat.tscn")
+
+	#get_tree().change_scene_to_file("res://sync.tscn")
+
+func on_loby_finished_created():
+	var scene = load("res://sync.tscn")
 	var instance = scene.instantiate()
 	add_child(instance)
 
+func on_lobby_finished_joined():
+	var scene = load("res://sync.tscn")
+	var instance = scene.instantiate()
+	add_child(instance)
 
 func _on_join_pressed() -> void:
 	lobby_id = int(line_edit.text)
@@ -42,6 +53,5 @@ func _on_join_pressed() -> void:
 	lobby.text += str(lobby_id)
 	lobby.visible = true
 	Network.enter_lobby(lobby_id)
-	var scene = load("res://Chat.tscn")
-	var instance = scene.instantiate()
-	add_child(instance)
+
+	#get_tree().change_scene_to_file("res://sync.tscn")
