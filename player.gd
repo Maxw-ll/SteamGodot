@@ -3,10 +3,11 @@ extends CharacterBody2D
 
 var speed := 500
 
+func _ready() -> void:
+    Console.log(str(multiplayer.multiplayer_peer))
 
 func _physics_process(_delta):
 
-    Console.log(str(multiplayer.multiplayer_peer))
     if not is_multiplayer_authority():
         return 
 

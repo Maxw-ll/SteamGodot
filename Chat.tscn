@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://bm8r216qiuf01"]
 
-[ext_resource type="Script" uid="uid://ckg1gqsvyv0im" path="res://control.gd" id="1_rgma2"]
+[ext_resource type="Script" uid="uid://dg2icvj2ggtrp" path="res://Chat.gd" id="1_rgma2"]
 
 [node name="Control" type="Control"]
 layout_mode = 3
@@ -14,6 +14,14 @@ offset_bottom = -253.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_rgma2")
+
+[node name="TextEdit2" type="TextEdit" parent="."]
+layout_mode = 0
+offset_left = 95.0
+offset_top = -142.0
+offset_right = 447.0
+offset_bottom = 90.0
+editable = false
 
 [node name="TextEdit" type="TextEdit" parent="."]
 layout_mode = 1

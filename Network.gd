@@ -17,7 +17,7 @@ func _ready() -> void:
 	Steam.connect("lobby_message", Callable(self, "_on_lobby_chat_message"))
 
 	Steam.lobby_match_list.connect(show_lobby_list)
-	my_id = Steam.getSteamID()
+	
 
 	_open_lobby_list()
 
@@ -52,7 +52,7 @@ func _on_lobby_created(success, lobby_id):
 		Console.log("[color=red] Erro ao criar o Lobby!")
 		return
 	lol_id = lobby_id
-	Steam.setLobbyData(lobby_id, "name", str(Steam.getPersonaName(), "SABYS's LOBBY"))
+	Steam.setLobbyData(lobby_id, "name", "Sabryna meu Amor, minha Vida ❤️.")
 	Console.log("Lobby ID real: " + str(lobby_id))
 	var peer = SteamMultiplayerPeer.new()
 	peer.host_with_lobby(lobby_id)
@@ -68,8 +68,8 @@ func _on_lobby_joined(lobby_id, permissions, locked, response):
 	Console.log("[JOIN] Permissions = " + str(permissions))
 	Console.log("[JOIN] Locked = " + str(locked))
 	var nm = Steam.getLobbyData(lobby_id, "name")
-	emit_signal("lobby_joinedd")
 	Console.log("Entrei no LOBBY de "+ str(nm))
+	
 	if Steam.getLobbyOwner(lobby_id) == Steam.getSteamID():
 		Console.log("SOU O HOST")
 		return
@@ -78,15 +78,16 @@ func _on_lobby_joined(lobby_id, permissions, locked, response):
 	peer.connect_to_lobby(lobby_id)
 	multiplayer.multiplayer_peer = peer
 	Console.log(str(multiplayer.multiplayer_peer))
+	emit_signal("lobby_joinedd")
 
 #Signal Lobby Data Update
 func _on_data_update(lobby_id: int, _changed_id: int, _making_change_id: int, _chat_state: int):
 	Console.log("[HOST] lobby_data_update disparou!")
-	Console.log("Player in Lobby: " + str(Steam.getNumLobbyMembers(lobby_id)))
+	Console.log("Player in Lobby : " + str(Steam.getNumLobbyMembers(lobby_id)))
 	
 	for i in range(Steam.getNumLobbyMembers(lobby_id)):
 		var player = Steam.getFriendPersonaName(Steam.getLobbyMemberByIndex(lobby_id, i))
-		Console.log(" - Player SteamID" + player)
+		Console.log(" - Player SteamID: " + player)
 
 
 ### END SIGNAL LOBBY ###
@@ -99,9 +100,10 @@ func initialize_steam():
 	
 	var initialize_response: Dictionary = Steam.steamInitEx()
 	var msg: String
-	
+
 	if initialize_response["status"] == 0:
 		msg = "Steam is Running"
+		my_id = Steam.getSteamID()
 		Console.log("[color=green] %s" % msg)
 	
 	if !Steam.isSubscribed(): 
@@ -110,6 +112,7 @@ func initialize_steam():
 	if initialize_response["status"] > 0:
 		msg = " Failed to Initialized Steam"
 		Console.log("[color=red] %s" %msg)
+	
 
 #Send Message
 func send_message(mdg: String):
