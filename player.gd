@@ -1,26 +1,28 @@
 extends CharacterBody2D
 
 
+@onready var name_label: LineEdit = $LineEdit
 var speed := 500
 
 func _ready() -> void:
-    Console.log(str(multiplayer.multiplayer_peer))
-
+	Console.log(str(multiplayer.multiplayer_peer))
+	
+	name_label.text = self.name
+	
 func _physics_process(_delta):
+	if not is_multiplayer_authority():
+		return
 
-    if not is_multiplayer_authority():
-        return 
+	var dir = Vector2.ZERO
 
-    var dir = Vector2.ZERO
+	if Input.is_action_pressed("ui_right"):
+		dir.x += 1
+	if Input.is_action_pressed("ui_left"):
+		dir.x -= 1
+	if Input.is_action_pressed("ui_down"):
+		dir.y += 1
+	if Input.is_action_pressed("ui_up"):
+		dir.y -= 1
 
-    if Input.is_action_pressed("ui_right"):
-        dir.x += 1
-    if Input.is_action_pressed("ui_left"):
-        dir.x -= 1
-    if Input.is_action_pressed("ui_down"):
-        dir.y += 1
-    if Input.is_action_pressed("ui_up"):
-        dir.y -= 1
-
-    velocity = dir.normalized() * speed
-    move_and_slide()
+	velocity = dir.normalized() * speed
+	move_and_slide()

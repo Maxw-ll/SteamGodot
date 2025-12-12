@@ -13,10 +13,8 @@ func _ready():
 	if multiplayer.is_server():
 		Console.log("HOST: spawning self " + str(multiplayer.get_unique_id()))
 		spawn(multiplayer.get_unique_id())
-
-		multiplayer.peer_disconnected.connect(_on_peer_disconnected)
 	# When a client connects
-	multiplayer.peer_connected.connect(_on_peer_connected)
+		multiplayer.peer_connected.connect(_on_peer_connected)
 
 
 func _on_peer_connected(id):
@@ -25,7 +23,7 @@ func _on_peer_connected(id):
 
 func _spawn_player(peer_id):
 	var p = player_scene.instantiate()
-	p.name = "Player_%s" % peer_id
+	p.name = "%s" % peer_id
 	p.set_multiplayer_authority(peer_id)
 	return p
 

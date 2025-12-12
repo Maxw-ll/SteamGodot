@@ -14,6 +14,22 @@ size = Vector2(123, 116)
 [node name="player" type="CharacterBody2D"]
 script = ExtResource("1_onrkg")
 
+[node name="LineEdit" type="LineEdit" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -34.0
+offset_top = -100.0
+offset_right = 34.5625
+offset_bottom = -69.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+editable = false
+expand_to_text_length = true
+
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_i3pqv")
 
@@ -23,3 +39,4 @@ replication_config = SubResource("SceneReplicationConfig_onrkg")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0.5, 0)
 shape = SubResource("RectangleShape2D_onrkg")
+disabled = true

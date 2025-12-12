@@ -78,6 +78,11 @@ func _on_lobby_joined(lobby_id, permissions, locked, response):
 	peer.connect_to_lobby(lobby_id)
 	multiplayer.multiplayer_peer = peer
 	Console.log(str(multiplayer.multiplayer_peer))
+	#var steam_id = Steam.getSteamID()
+	var peer_id = multiplayer.get_unique_id()
+
+	Steam.setLobbyMemberData(lobby_id, "peer_id", str(peer_id))
+
 	emit_signal("lobby_joinedd")
 
 #Signal Lobby Data Update
