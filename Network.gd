@@ -59,7 +59,7 @@ func _on_lobby_created(success, lobby_id):
 	multiplayer.multiplayer_peer = peer
 	emit_signal("lobby_createdd", str(lobby_id))
 	Console.log(str(multiplayer.multiplayer_peer))
-	
+
 #Signal Lobby Joined
 func _on_lobby_joined(lobby_id, permissions, locked, response):
 	lol_id = lobby_id
@@ -68,16 +68,17 @@ func _on_lobby_joined(lobby_id, permissions, locked, response):
 	Console.log("[JOIN] Permissions = " + str(permissions))
 	Console.log("[JOIN] Locked = " + str(locked))
 	var nm = Steam.getLobbyData(lobby_id, "name")
-	emit_signal("lobby_joinedd")
 	Console.log("Entrei no LOBBY de "+ str(nm))
 	if Steam.getLobbyOwner(lobby_id) == Steam.getSteamID():
 		Console.log("SOU O HOST")
-		return
-	
-	var peer = SteamMultiplayerPeer.new()
-	peer.connect_to_lobby(lobby_id)
-	multiplayer.multiplayer_peer = peer
-	Console.log(str(multiplayer.multiplayer_peer))
+	else:
+		var peer = SteamMultiplayerPeer.new()
+		peer.connect_to_lobby(lobby_id)
+		multiplayer.multiplayer_peer = peer
+		Console.log(str(multiplayer.multiplayer_peer))
+		emit_signal("lobby_joinedd")
+
+	#Console.log("Peers conectados: " + str(multiplayer.get_peers()))
 
 #Signal Lobby Data Update
 func _on_data_update(lobby_id: int, _changed_id: int, _making_change_id: int, _chat_state: int):
@@ -87,6 +88,9 @@ func _on_data_update(lobby_id: int, _changed_id: int, _making_change_id: int, _c
 	for i in range(Steam.getNumLobbyMembers(lobby_id)):
 		var player = Steam.getFriendPersonaName(Steam.getLobbyMemberByIndex(lobby_id, i))
 		Console.log(" - Player SteamID" + player)
+	
+	#Console.log("Peers conectados: " + str(multiplayer.get_peers()))
+
 
 
 ### END SIGNAL LOBBY ###
