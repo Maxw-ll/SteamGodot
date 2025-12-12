@@ -23,14 +23,6 @@ func _on_log(msg: String):
 func _on_host_pressed() -> void:
 	Network.create_lobby()
 
-func _on_lobby_create_mx(id):
-	#Console.log("Entrou no Line Edit")
-	join.queue_free()
-	host.queue_free()
-	line_edit.queue_free()
-	lobby.text += id
-	lobby_id = int(id)
-	lobby.visible = true
 
 func on_loby_finished_created(id):
 	join.queue_free()
@@ -39,15 +31,17 @@ func on_loby_finished_created(id):
 	lobby.text += id
 	lobby_id = int(id)
 	lobby.visible = true
-	var scene = load("res://Chat.tscn")
-	var instance = scene.instantiate()
-	add_child(instance)
+	var snce = preload("res://sync.tscn")
+	var k = snce.instantiate()
+	add_child(k)
+	
 
 func on_lobby_finished_joined():
-	var scene = load("res://Chat.tscn")
-	var instance = scene.instantiate()
-	add_child(instance)
+	var snce = preload("res://sync.tscn")
+	var k = snce.instantiate()
+	add_child(k)
 
+	
 func _on_join_pressed() -> void:
 	lobby_id = int(line_edit.text)
 	join.queue_free()
