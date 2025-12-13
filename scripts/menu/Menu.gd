@@ -28,13 +28,14 @@ func _on_host_pressed() -> void:
 func _on_join_pressed() -> void:
 	lobby_label.text += line_edit.text
 	lobby_label.visible = true
-	Multiplayer.join_lobby(int(line_edit.text))
+	Multiplayer.join_lobby(line_edit.text)
 	kill_inputs()
 
 #Qunando o Lobby foi criado!
-func on_loby_finished_created(this_lobby_id) -> void:
-	lobby_label.text += this_lobby_id
+func on_loby_finished_created(this_lobby_data: Dictionary) -> void:
+	lobby_label.text += this_lobby_data["room_code"]
 	lobby_label.visible = true
+	Console.log(this_lobby_data["room_code"])
 	load_scene()
 
 #Quando entrar no Lobby carregar a cena

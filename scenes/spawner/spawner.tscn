@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://36fk7kq7vg1i"]
+[gd_scene load_steps=4 format=3 uid="uid://36fk7kq7vg1i"]
 
 [ext_resource type="Script" uid="uid://cg54qogdjg7x1" path="res://scripts/spawner/multiplayer_spawner.gd" id="1_eoeca"]
 [ext_resource type="PackedScene" uid="uid://bob4rlx3jmxm" path="res://scenes/player/player.tscn" id="2_wtxcb"]
+[ext_resource type="PackedScene" uid="uid://bm8r216qiuf01" path="res://scenes/chat/Chat.tscn" id="3_uhn3r"]
 
 [node name="Node2D" type="Node2D"]
 
@@ -9,3 +10,9 @@
 spawn_path = NodePath(".")
 script = ExtResource("1_eoeca")
 player_scene = ExtResource("2_wtxcb")
+
+[node name="Control" parent="." instance=ExtResource("3_uhn3r")]
+offset_left = 36.0
+offset_top = 435.0
+offset_right = 336.0
+offset_bottom = 635.0

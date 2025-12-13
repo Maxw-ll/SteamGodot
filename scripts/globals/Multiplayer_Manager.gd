@@ -6,12 +6,17 @@ var is_host: bool = false
 var lobby_id: int
 var lobby_name: String
 var peer_id: int
+var room_code: String
+var room_code_length = 6
+var join_room_code: String
 
-signal lobby_created(id)
+signal lobby_created(lobby_data: Dictionary)
 signal lobby_joined
+signal lobby_founded
 
 ##################### INICIALIZAÇÃO #####################
 func _ready() -> void:
+	randomize()
 	Network.connect("steam_on", Callable(self, "_on_steam_connect"))
 
 
@@ -20,10 +25,11 @@ func _on_steam_connect() -> void:
 	Steam.connect("lobby_created", Callable(self, "_on_lobby_created"))
 	Steam.connect("lobby_joined", Callable(self, "_on_lobby_joined"))
 	Steam.connect("lobby_chat_update", Callable(self, "_on_data_update"))
+	lobby_founded.connect(join_lobby_founded)
 
 	Steam.lobby_match_list.connect(show_lobby_list)
 	
-	_open_lobby_list()
+	#_open_lobby_list()
 
 ##################### LOBBY INFORMATIONS #####################
 func _open_lobby_list() -> void:
@@ -31,12 +37,28 @@ func _open_lobby_list() -> void:
 	Steam.requestLobbyList()
 
 
+func search_room_code_in_lobby_list(lobbies) -> void:
+
+	for lb in lobbies:
+		var this_room_code: String = Steam.getLobbyData(lb, "room_code")
+		if this_room_code != "" and this_room_code == join_room_code:
+			lobby_id = lb
+			await get_tree().create_timer(0.5).timeout
+			emit_signal("lobby_founded")
+			Console.log("SALA ENCONTRADA!")
+			return
+	
+	Console.log("SALA NÃO ENCONTRADA!")
+
+
+		
 func show_lobby_list(lobbies) -> void:
 
 	for lb in lobbies:
 		var this_lobby_name: String = Steam.getLobbyData(lb, "name")
+		var this_room_code: String = Steam.getLobbyData(lb, "room_code")
 		var numMembers: int = Steam.getNumLobbyMembers(lb)
-		Console.log(str(lb) + " { "+this_lobby_name+" } " + ": " + str(numMembers) +" membros")
+		Console.log(str(lb) + " " + this_room_code +" { "+this_lobby_name+" } " + ": " + str(numMembers) +" membros")
 
 
 ##################### SINAIS LOBBY #####################
@@ -60,8 +82,11 @@ func _on_lobby_created(success, this_lobby_id) -> void:
 	peer_id = multiplayer.get_unique_id()
 	is_host = true
 
+	var lobby_data = code_room_generator(room_code_length)
+	Steam.setLobbyData(lobby_id, "room_code", lobby_data["room_code"])
+
 	#Emitir sinal Lobby criado!
-	emit_signal("lobby_created", str(lobby_id))
+	emit_signal("lobby_created", lobby_data)
 
 #Sinal Entrou no Lobby
 func _on_lobby_joined(this_lobby_id, _permissions, _locked, _response) -> void:
@@ -97,9 +122,22 @@ func create_lobby(max_players := 6) -> void:
 	Steam.createLobby(Steam.LOBBY_TYPE_PUBLIC, max_players)
 
 #Join Lobby
-func join_lobby(this_lobby_id) -> void:
+func join_lobby(this_lobby_room_code) -> void:
+
+	Steam.lobby_match_list.connect(search_room_code_in_lobby_list)
+	Steam.lobby_match_list.disconnect(show_lobby_list)
+
+	join_room_code = this_lobby_room_code
+	Console.log(join_room_code)
+
+	_open_lobby_list()
+	#Vamos ter que procurar pelo lobby que tenha o mesmo código enviado!
+
+func join_lobby_founded() -> void:
 	Console.log("[Entrando no Lobby...]")
-	Steam.joinLobby(this_lobby_id)
+	Steam.joinLobby(lobby_id)
+
+
 
 #Verify Friends -> Imprimir a Lista de Amigos
 func verifiy_friends() -> void:
@@ -112,3 +150,19 @@ func verifiy_friends() -> void:
 		var steam_id: int = Steam.getFriendByIndex(i, Steam.FRIEND_FLAG_IMMEDIATE)
 		var friend_name: String = Steam.getFriendPersonaName(steam_id)
 		Console.log(friend_name)
+
+#Gerador Aleatório para os Códigos das Salas
+func code_room_generator(length_code: int) -> Dictionary:
+
+	var this_room_code: String = ""
+
+	var chars: String = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	
+	for i in range(length_code):
+		var index_random: int = randi()%36
+		this_room_code += chars[index_random]
+	
+	room_code = this_room_code
+	var lobby_data = {"lobby_id": lobby_id, "room_code": room_code}
+	
+	return lobby_data
