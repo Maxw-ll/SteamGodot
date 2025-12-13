@@ -49,7 +49,7 @@ func _on_lobby_created(success, this_lobby_id) -> void:
 
 	lobby_id = this_lobby_id
 	#Mudar o nome do Lobby
-	Steam.setLobbyData(lobby_id, "name", "Sabryna meu Love, my Life❤️.")
+	Steam.setLobbyData(lobby_id, "name", "Sabryna my Love, my Life❤️.")
 	lobby_name = Steam.getLobbyData(lobby_id, "name")
 	Console.log("Lobby ID: " + str(lobby_id))
 
