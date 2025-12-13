@@ -13,12 +13,13 @@ config_version=5
 config/name="SteamTestConect"
 run/main_scene="uid://tki0e12u0q4q"
 config/features=PackedStringArray("4.5", "Forward Plus")
-config/icon="res://icon.svg"
+config/icon="uid://br2078o8u4gyg"
 
 [autoload]
 
-Network="*res://Network.gd"
-Console="*res://Console.gd"
+Console="*res://scripts/globals/Console.gd"
+Multiplayer="*res://scripts/globals/Multiplayer_Manager.gd"
+Network="*res://scripts/globals/Network_Manager.gd"
 
 [input]
 

@@ -2,7 +2,7 @@ extends MultiplayerSpawner
 
 @export var player_scene: PackedScene
 
-func _ready():
+func _ready() -> void:
 	# Cena spawnável automática
 	add_spawnable_scene(player_scene.resource_path)
 
@@ -16,20 +16,11 @@ func _ready():
 	# When a client connects
 		multiplayer.peer_connected.connect(_on_peer_connected)
 
-
-func _on_peer_connected(id):
-	Console.log("HOST: spawning new client " + str(id))
+func _on_peer_connected(id) -> void:
 	spawn(id)
 
-func _spawn_player(peer_id):
+func _spawn_player(peer_id) -> CharacterBody2D:
 	var p = player_scene.instantiate()
 	p.name = "%s" % peer_id
 	p.set_multiplayer_authority(peer_id)
 	return p
-
-func _on_peer_disconnected(peer_id):
-	print("Removendo player do peer ", peer_id)
-
-	var player_node = get_node_or_null("Player_%s" % peer_id)
-	if player_node:
-		player_node.queue_free()

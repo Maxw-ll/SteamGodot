@@ -1,0 +1,114 @@
+extends Node
+
+
+#
+var is_host: bool = false
+var lobby_id: int
+var lobby_name: String
+var peer_id: int
+
+signal lobby_created(id)
+signal lobby_joined
+
+##################### INICIALIZAÇÃO #####################
+func _ready() -> void:
+	Network.connect("steam_on", Callable(self, "_on_steam_connect"))
+
+
+#Chamado após o acesso à Steam funcionar
+func _on_steam_connect() -> void:
+	Steam.connect("lobby_created", Callable(self, "_on_lobby_created"))
+	Steam.connect("lobby_joined", Callable(self, "_on_lobby_joined"))
+	Steam.connect("lobby_chat_update", Callable(self, "_on_data_update"))
+
+	Steam.lobby_match_list.connect(show_lobby_list)
+	
+	_open_lobby_list()
+
+##################### LOBBY INFORMATIONS #####################
+func _open_lobby_list() -> void:
+	Steam.addRequestLobbyListDistanceFilter(Steam.LOBBY_DISTANCE_FILTER_WORLDWIDE)
+	Steam.requestLobbyList()
+
+
+func show_lobby_list(lobbies) -> void:
+
+	for lb in lobbies:
+		var this_lobby_name: String = Steam.getLobbyData(lb, "name")
+		var numMembers: int = Steam.getNumLobbyMembers(lb)
+		Console.log(str(lb) + " { "+this_lobby_name+" } " + ": " + str(numMembers) +" membros")
+
+
+##################### SINAIS LOBBY #####################
+
+#Sinal Criação do Lobby
+func _on_lobby_created(success, this_lobby_id) -> void:
+	if not success:
+		Console.log("[color=red] Erro ao criar o Lobby!")
+		return
+
+	lobby_id = this_lobby_id
+	#Mudar o nome do Lobby
+	Steam.setLobbyData(lobby_id, "name", "Sabryna meu Love, my Life❤️.")
+	lobby_name = Steam.getLobbyData(lobby_id, "name")
+	Console.log("Lobby ID: " + str(lobby_id))
+
+	#Criando o servidor [HOST]
+	var peer: MultiplayerPeer = SteamMultiplayerPeer.new()
+	peer.host_with_lobby(lobby_id)
+	multiplayer.multiplayer_peer = peer
+	peer_id = multiplayer.get_unique_id()
+	is_host = true
+
+	#Emitir sinal Lobby criado!
+	emit_signal("lobby_created", str(lobby_id))
+
+#Sinal Entrou no Lobby
+func _on_lobby_joined(this_lobby_id, _permissions, _locked, _response) -> void:
+	lobby_id =  this_lobby_id
+	Console.log(Network.steam_name + " entrou no Lobby")
+	
+	#Se for o HOST não cria mais peer para ele
+	if Steam.getLobbyOwner(this_lobby_id) == Steam.getSteamID():
+		return
+	
+	#Criando Peer Cliente e se concetando ao Host pelo Lobby
+	var peer: MultiplayerPeer = SteamMultiplayerPeer.new()
+	peer.connect_to_lobby(lobby_id)
+	multiplayer.multiplayer_peer = peer
+	peer_id = multiplayer.get_unique_id()
+
+	emit_signal("lobby_joined")
+
+#Sinal Lobby Update (Quando Alguém entra ou sai do Lobby)
+func _on_data_update(_this_lobby_id: int, _changed_id: int, _making_change_id: int, _chat_state: int) -> void:
+	Console.log("Players in Lobby : ")
+	for i in range(Steam.getNumLobbyMembers(lobby_id)):
+		var player_name: String = Steam.getFriendPersonaName(Steam.getLobbyMemberByIndex(lobby_id, i))
+		Console.log(" - Player SteamID: " + player_name)
+
+
+
+##################### FUNCTIONS  #####################
+	
+#Create Lobby
+func create_lobby(max_players := 6) -> void:
+	Console.log("[Criando Lobby...]")
+	Steam.createLobby(Steam.LOBBY_TYPE_PUBLIC, max_players)
+
+#Join Lobby
+func join_lobby(this_lobby_id) -> void:
+	Console.log("[Entrando no Lobby...]")
+	Steam.joinLobby(this_lobby_id)
+
+#Verify Friends -> Imprimir a Lista de Amigos
+func verifiy_friends() -> void:
+	Console.log("[color=green] " + str(Steam.getFriendCount(Steam.FRIEND_FLAG_IMMEDIATE)) + " amigos encontrados!")
+	var my_name: String = Steam.getPersonaName()
+	Console.log("My name is " + my_name)
+	Console.log("Amigos:")
+	
+	for i in range(0, Steam.getFriendCount(Steam.FRIEND_FLAG_IMMEDIATE)):
+		var steam_id: int = Steam.getFriendByIndex(i, Steam.FRIEND_FLAG_IMMEDIATE)
+		var friend_name: String = Steam.getFriendPersonaName(steam_id)
+		Console.log(friend_name)
