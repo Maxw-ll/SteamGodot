@@ -10,7 +10,7 @@ var room_code: String
 var room_code_length = 6
 var join_room_code: String
 
-signal lobby_created(lobby_data: Dictionary)
+signal lobby_created(lobby_code: String)
 signal lobby_joined
 signal lobby_founded
 
@@ -25,8 +25,8 @@ func _on_steam_connect() -> void:
 	Steam.connect("lobby_created", Callable(self, "_on_lobby_created"))
 	Steam.connect("lobby_joined", Callable(self, "_on_lobby_joined"))
 	Steam.connect("lobby_chat_update", Callable(self, "_on_data_update"))
-	lobby_founded.connect(join_lobby_founded)
 
+	lobby_founded.connect(join_lobby_founded)
 	Steam.lobby_match_list.connect(show_lobby_list)
 	
 	#_open_lobby_list()
@@ -41,13 +41,14 @@ func search_room_code_in_lobby_list(lobbies) -> void:
 
 	for lb in lobbies:
 		var this_room_code: String = Steam.getLobbyData(lb, "room_code")
-		if this_room_code != "" and this_room_code == join_room_code:
-			lobby_id = lb
-			await get_tree().create_timer(0.5).timeout
-			emit_signal("lobby_founded")
-			Console.log("SALA ENCONTRADA!")
-			return
-	
+		if this_room_code != "":
+			if this_room_code == join_room_code:
+				lobby_id = lb
+				await get_tree().create_timer(0.5).timeout
+				emit_signal("lobby_founded")
+				Console.log("SALA ENCONTRADA!")
+				return
+		
 	Console.log("SALA NÃO ENCONTRADA!")
 
 
@@ -58,6 +59,7 @@ func show_lobby_list(lobbies) -> void:
 		var this_lobby_name: String = Steam.getLobbyData(lb, "name")
 		var this_room_code: String = Steam.getLobbyData(lb, "room_code")
 		var numMembers: int = Steam.getNumLobbyMembers(lb)
+		
 		Console.log(str(lb) + " " + this_room_code +" { "+this_lobby_name+" } " + ": " + str(numMembers) +" membros")
 
 
@@ -71,9 +73,11 @@ func _on_lobby_created(success, this_lobby_id) -> void:
 
 	lobby_id = this_lobby_id
 	#Mudar o nome do Lobby
-	Steam.setLobbyData(lobby_id, "name", "Sabryna my Love, my Life❤️.")
+	Steam.setLobbyData(lobby_id, "name", "Sabryna my Love, my Life")
+	code_room_generator(room_code_length)
+	Steam.setLobbyData(lobby_id, "room_code", room_code)
 	lobby_name = Steam.getLobbyData(lobby_id, "name")
-	Console.log("Lobby ID: " + str(lobby_id))
+	Console.log("Lobby Nome e ID: " + lobby_name + " " + str(lobby_id))
 
 	#Criando o servidor [HOST]
 	var peer: MultiplayerPeer = SteamMultiplayerPeer.new()
@@ -82,20 +86,21 @@ func _on_lobby_created(success, this_lobby_id) -> void:
 	peer_id = multiplayer.get_unique_id()
 	is_host = true
 
-	var lobby_data = code_room_generator(room_code_length)
-	Steam.setLobbyData(lobby_id, "room_code", lobby_data["room_code"])
-
+	
 	#Emitir sinal Lobby criado!
-	emit_signal("lobby_created", lobby_data)
+	emit_signal("lobby_created", room_code)
 
 #Sinal Entrou no Lobby
 func _on_lobby_joined(this_lobby_id, _permissions, _locked, _response) -> void:
-	lobby_id =  this_lobby_id
 	Console.log(Network.steam_name + " entrou no Lobby")
 	
 	#Se for o HOST não cria mais peer para ele
-	if Steam.getLobbyOwner(this_lobby_id) == Steam.getSteamID():
+	if is_host:
+		Console.log(str(Steam.getNumLobbyMembers(lobby_id)))
 		return
+	else:
+		lobby_id = this_lobby_id
+		
 	
 	#Criando Peer Cliente e se concetando ao Host pelo Lobby
 	var peer: MultiplayerPeer = SteamMultiplayerPeer.new()
@@ -127,6 +132,7 @@ func join_lobby(this_lobby_room_code) -> void:
 	Steam.lobby_match_list.connect(search_room_code_in_lobby_list)
 	Steam.lobby_match_list.disconnect(show_lobby_list)
 
+	Console.log(join_room_code)
 	join_room_code = this_lobby_room_code
 	Console.log(join_room_code)
 
@@ -135,6 +141,7 @@ func join_lobby(this_lobby_room_code) -> void:
 
 func join_lobby_founded() -> void:
 	Console.log("[Entrando no Lobby...]")
+	Console.log("Entrando no Lobby ID: " + str(lobby_id))
 	Steam.joinLobby(lobby_id)
 
 
@@ -152,7 +159,7 @@ func verifiy_friends() -> void:
 		Console.log(friend_name)
 
 #Gerador Aleatório para os Códigos das Salas
-func code_room_generator(length_code: int) -> Dictionary:
+func code_room_generator(length_code: int) -> void:
 
 	var this_room_code: String = ""
 
@@ -163,6 +170,3 @@ func code_room_generator(length_code: int) -> Dictionary:
 		this_room_code += chars[index_random]
 	
 	room_code = this_room_code
-	var lobby_data = {"lobby_id": lobby_id, "room_code": room_code}
-	
-	return lobby_data

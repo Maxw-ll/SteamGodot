@@ -1,10 +1,12 @@
 extends Control
 
 @onready var rich_text_label: RichTextLabel = $RichTextLabel
-@onready var line_edit: LineEdit = $LineEdit
+@onready var line_code: LineEdit = $LineEdit
 @onready var lobby_label: LineEdit = $LineEdit2
 @onready var join: Button = $join
 @onready var host: Button = $host
+
+var is_line_code_excluded: bool = false
 
 ##################### INICIALIZAÇÃO #####################
 func _ready() -> void:
@@ -13,6 +15,21 @@ func _ready() -> void:
 	Console.connect("log_msg", Callable(self, "_on_log"))
 
 ##################### SINAIS DE CONEXÃO ##################### 
+
+func _physics_process(_delta: float) -> void:
+	if not is_line_code_excluded:
+		clean_label_code()
+
+
+func clean_label_code() -> void:
+	var code_cleaned: String = ""
+	if line_code.is_inside_tree():
+		for ch in line_code.text:
+			if ch == " ":
+				continue
+			code_cleaned += ch
+		
+		line_code.text = code_cleaned
 
 #Conceta à função de Imprimir no Console
 func _on_log(msg: String) -> void:
@@ -26,16 +43,16 @@ func _on_host_pressed() -> void:
 
 #Iniciar entrada no lobby quando cliar no Join
 func _on_join_pressed() -> void:
-	lobby_label.text += line_edit.text
+	lobby_label.text += line_code.text
 	lobby_label.visible = true
-	Multiplayer.join_lobby(line_edit.text)
+	Multiplayer.join_lobby(line_code.text)
 	kill_inputs()
 
 #Qunando o Lobby foi criado!
-func on_loby_finished_created(this_lobby_data: Dictionary) -> void:
-	lobby_label.text += this_lobby_data["room_code"]
+func on_loby_finished_created(this_lobby_code: String) -> void:
+	lobby_label.text += this_lobby_code
 	lobby_label.visible = true
-	Console.log(this_lobby_data["room_code"])
+	Console.log(this_lobby_code)
 	load_scene()
 
 #Quando entrar no Lobby carregar a cena
@@ -52,4 +69,5 @@ func load_scene() -> void:
 func kill_inputs() -> void:
 	join.queue_free()
 	host.queue_free()
-	line_edit.queue_free()
+	is_line_code_excluded = true
+	line_code.queue_free()
