@@ -1,5 +1,9 @@
 extends CharacterBody2D
 
+var Data: Dictionary = {
+	"name": name,
+	"color": Color(1, 1, 1, 1)
+}
 
 @onready var name_label: LineEdit = $LineEdit
 @onready var sprite: Sprite2D = $Sprite2D

@@ -1,0 +1,73 @@
+[gd_scene load_steps=2 format=3 uid="uid://cu1b3ya77pw1m"]
+
+[ext_resource type="Script" uid="uid://bjxbig24w2agn" path="res://scripts/player/player_scene.gd" id="1_mr4qx"]
+
+[node name="player_card" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_mr4qx")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = -15.5
+offset_bottom = 15.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="cards" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="card_1" type="Label" parent="VBoxContainer/cards"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Condessa"
+
+[node name="card_2" type="Label" parent="VBoxContainer/cards"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Assassino"
+
+[node name="players" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="acoes" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="renda" type="Button" parent="VBoxContainer/acoes"]
+layout_mode = 2
+text = "Renda"
+
+[node name="coup" type="Button" parent="VBoxContainer/acoes"]
+layout_mode = 2
+text = "Coup"
+
+[node name="ajuda_externa" type="Button" parent="VBoxContainer/acoes"]
+layout_mode = 2
+text = "Ajuda Externa"
+
+[node name="roubar" type="Button" parent="VBoxContainer/acoes"]
+layout_mode = 2
+text = "Roubar"
+
+[node name="assassinar" type="Button" parent="VBoxContainer/acoes"]
+layout_mode = 2
+text = "Assassinar"
+
+[node name="tributario" type="Button" parent="VBoxContainer/acoes"]
+layout_mode = 2
+text = "Tributario"
+
+[node name="troca_troca" type="Button" parent="VBoxContainer/acoes"]
+layout_mode = 2
+text = "Troca Troca"

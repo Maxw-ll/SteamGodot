@@ -1,0 +1,20 @@
+[gd_scene load_steps=2 format=3 uid="uid://csr0j714nr1qv"]
+
+[ext_resource type="Script" uid="uid://cc10o786gu80l" path="res://scripts/player/player_info.gd" id="1_sip43"]
+
+[node name="player_info" type="VBoxContainer"]
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_sip43")
+
+[node name="nome" type="Label" parent="."]
+layout_mode = 2
+text = "Name_Player"
+
+[node name="cards" type="Label" parent="."]
+layout_mode = 2
+text = "Cards:"
+
+[node name="moedas" type="Label" parent="."]
+layout_mode = 2
+text = "Moedas:"

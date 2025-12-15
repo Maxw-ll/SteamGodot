@@ -29,7 +29,7 @@ func _on_steam_connect() -> void:
 	lobby_founded.connect(join_lobby_founded)
 	Steam.lobby_match_list.connect(show_lobby_list)
 	
-	#_open_lobby_list()
+	_open_lobby_list()
 
 ##################### LOBBY INFORMATIONS #####################
 func _open_lobby_list() -> void:

@@ -6,7 +6,6 @@ extends Control
 @onready var join: Button = $join
 @onready var host: Button = $host
 
-var is_line_code_excluded: bool = false
 
 ##################### INICIALIZAÇÃO #####################
 func _ready() -> void:
@@ -15,21 +14,6 @@ func _ready() -> void:
 	Console.connect("log_msg", Callable(self, "_on_log"))
 
 ##################### SINAIS DE CONEXÃO ##################### 
-
-func _physics_process(_delta: float) -> void:
-	if not is_line_code_excluded:
-		clean_label_code()
-
-
-func clean_label_code() -> void:
-	var code_cleaned: String = ""
-	if line_code.is_inside_tree():
-		for ch in line_code.text:
-			if ch == " ":
-				continue
-			code_cleaned += ch
-		
-		line_code.text = code_cleaned
 
 #Conceta à função de Imprimir no Console
 func _on_log(msg: String) -> void:
@@ -45,7 +29,7 @@ func _on_host_pressed() -> void:
 func _on_join_pressed() -> void:
 	lobby_label.text += line_code.text
 	lobby_label.visible = true
-	Multiplayer.join_lobby(line_code.text)
+	Multiplayer.join_lobby(line_code.text.strip_edges())
 	kill_inputs()
 
 #Qunando o Lobby foi criado!
@@ -69,5 +53,4 @@ func load_scene() -> void:
 func kill_inputs() -> void:
 	join.queue_free()
 	host.queue_free()
-	is_line_code_excluded = true
 	line_code.queue_free()
