@@ -23,19 +23,19 @@ func _ready() -> void:
     button_troca_troca.connect("pressed", Callable(self, "on_troca_troca_pressed"))
 
     if Multiplayer.is_host:
-        var data = {}
-        update_player_container.rpc(data)
+        Console.log("Host entrou no player")
+        #update_player_container.rpc(Multiplayer.players_in_lobby)
 
 
-@rpc("any_peer")
-func update_player_container(Players_Data: Dictionary):
+@rpc("any_peer", "call_local")
+func update_player_container(Players_Data: Array):
     
     for player in players_container.get_children():
         player.queue_free()
     
-    for kye in Players_Data.keys():
+    for kye in Players_Data:
         var scene_instantiated = scene_player_info.instantiate()
-        scene_instantiated.update_name(Players_Data["nome"])
+        scene_instantiated.update_name(kye["name"])
         scene_instantiated.update_cards(2)
         scene_instantiated.update_moedas(2)
         players_container.add_child(scene_instantiated)

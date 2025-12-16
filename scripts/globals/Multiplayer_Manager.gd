@@ -75,7 +75,8 @@ func _on_lobby_created(success, this_lobby_id) -> void:
 	lobby_id = this_lobby_id
 	#Mudar o nome do Lobby
 	Steam.setLobbyData(lobby_id, "name", "Sabryna my Love, my Life")
-	code_room_generator(room_code_length)
+	var k_room_code = code_room_generator(room_code_length)
+	room_code = k_room_code
 	Steam.setLobbyData(lobby_id, "room_code", room_code)
 	lobby_name = Steam.getLobbyData(lobby_id, "name")
 	Console.log("Lobby Nome e ID: " + lobby_name + " " + str(lobby_id))
@@ -122,21 +123,16 @@ func _on_data_update(_this_lobby_id: int, _changed_id: int, _making_change_id: i
 		var player_name: String = Steam.getFriendPersonaName(Steam.getLobbyMemberByIndex(lobby_id, i))
 		Console.log(" - Player SteamID: " + player_name)
 		var players_exist: bool = false
-		var count_index: int = 0
 		for p in players_in_lobby:
 			if p["name"] == player_name:
 				players_exist = true
 				break
-			count_index += 1
-
+		
 		if not players_exist:
-			players_in_lobby.append({"steam_id": _changed_id, "nome": Steam.getFriendPersonaName(_changed_id)})
-		else:
-			players_in_lobby.pop_at(count_index)
+			players_in_lobby.append({"steam_id": 0, "name": player_name})
 		
 
 	Console.log(str(players_in_lobby))
-	rpc("update_player_container", players_in_lobby)
 
 
 ##################### FUNCTIONS  #####################
@@ -179,7 +175,7 @@ func verifiy_friends() -> void:
 		Console.log(friend_name)
 
 #Gerador Aleatório para os Códigos das Salas
-func code_room_generator(length_code: int) -> void:
+func code_room_generator(length_code: int) -> String:
 
 	var this_room_code: String = ""
 
@@ -189,4 +185,4 @@ func code_room_generator(length_code: int) -> void:
 		var index_random: int = randi()%36
 		this_room_code += chars[index_random]
 	
-	room_code = this_room_code
+	return this_room_code

@@ -45,7 +45,7 @@ func on_lobby_finished_joined() -> void:
 
 #Carregar a Cena do Spawner
 func load_scene() -> void:
-	var scene: PackedScene = preload("res://scenes/lobby/lobby.tscn")
+	var scene: PackedScene = preload("res://scenes/player/player_scene.tscn")
 	var scene_instantiated = scene.instantiate()
 	add_child(scene_instantiated)
 

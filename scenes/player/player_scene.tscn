@@ -37,6 +37,7 @@ size_flags_horizontal = 4
 text = "Assassino"
 
 [node name="players" type="HBoxContainer" parent="VBoxContainer"]
+z_index = -10
 layout_mode = 2
 size_flags_horizontal = 4
 
