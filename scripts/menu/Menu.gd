@@ -9,8 +9,8 @@ extends Control
 
 ##################### INICIALIZAÇÃO #####################
 func _ready() -> void:
-	Multiplayer.connect("lobby_created", Callable(self, "on_loby_finished_created"))
-	Multiplayer.connect("lobby_joined", Callable(self, "on_lobby_finished_joined"))
+	Multiplayer.connect("lobby_createdd", Callable(self, "on_loby_finished_created"))
+	Multiplayer.connect("lobby_joinedd", Callable(self, "on_lobby_finished_joined"))
 	Console.connect("log_msg", Callable(self, "_on_log"))
 
 ##################### SINAIS DE CONEXÃO ##################### 

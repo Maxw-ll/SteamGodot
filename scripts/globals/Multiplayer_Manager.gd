@@ -9,9 +9,10 @@ var peer_id: int
 var room_code: String
 var room_code_length = 6
 var join_room_code: String
+var players_in_lobby: Array
 
-signal lobby_created(lobby_code: String)
-signal lobby_joined
+signal lobby_createdd(lobby_code: String)
+signal lobby_joinedd
 signal lobby_founded
 
 ##################### INICIALIZAÇÃO #####################
@@ -88,7 +89,7 @@ func _on_lobby_created(success, this_lobby_id) -> void:
 
 	
 	#Emitir sinal Lobby criado!
-	emit_signal("lobby_created", room_code)
+	emit_signal("lobby_createdd", room_code)
 
 #Sinal Entrou no Lobby
 func _on_lobby_joined(this_lobby_id, _permissions, _locked, _response) -> void:
@@ -108,15 +109,34 @@ func _on_lobby_joined(this_lobby_id, _permissions, _locked, _response) -> void:
 	multiplayer.multiplayer_peer = peer
 	peer_id = multiplayer.get_unique_id()
 
-	emit_signal("lobby_joined")
+	if is_host:
+		players_in_lobby.append({"steam_id": Steam.getSteamID(), "name": Steam.getPersonaName()})
+
+	emit_signal("lobby_joinedd")
 
 #Sinal Lobby Update (Quando Alguém entra ou sai do Lobby)
 func _on_data_update(_this_lobby_id: int, _changed_id: int, _making_change_id: int, _chat_state: int) -> void:
 	Console.log("Players in Lobby : ")
+
 	for i in range(Steam.getNumLobbyMembers(lobby_id)):
 		var player_name: String = Steam.getFriendPersonaName(Steam.getLobbyMemberByIndex(lobby_id, i))
 		Console.log(" - Player SteamID: " + player_name)
+		var players_exist: bool = false
+		var count_index: int = 0
+		for p in players_in_lobby:
+			if p["name"] == player_name:
+				players_exist = true
+				break
+			count_index += 1
 
+		if not players_exist:
+			players_in_lobby.append({"steam_id": _changed_id, "nome": Steam.getFriendPersonaName(_changed_id)})
+		else:
+			players_in_lobby.pop_at(count_index)
+		
+
+	Console.log(str(players_in_lobby))
+	rpc("update_player_container", players_in_lobby)
 
 
 ##################### FUNCTIONS  #####################

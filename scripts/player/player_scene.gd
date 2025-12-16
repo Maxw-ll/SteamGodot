@@ -22,6 +22,10 @@ func _ready() -> void:
     button_tributario.connect("pressed", Callable(self, "on_tributario_pressed"))
     button_troca_troca.connect("pressed", Callable(self, "on_troca_troca_pressed"))
 
+    if Multiplayer.is_host:
+        var data = {}
+        update_player_container.rpc(data)
+
 
 @rpc("any_peer")
 func update_player_container(Players_Data: Dictionary):
