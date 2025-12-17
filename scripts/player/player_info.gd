@@ -5,10 +5,9 @@ extends VBoxContainer
 @onready var moedas: Label = $moedas
 
 func update_name(nome: String):
-    name_name.text = nome
-    
-func update_cards(nome: int):
-   cards.text = str(nome)
+   name_name.text = nome
 
+func update_cards(nome: int):
+   cards.text += str(nome)
 func update_moedas(nome: int):
-   moedas.text = str(nome)
+   moedas.text += str(nome)

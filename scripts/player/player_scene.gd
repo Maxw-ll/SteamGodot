@@ -24,7 +24,8 @@ func _ready() -> void:
 
     if Multiplayer.is_host:
         Console.log("Host entrou no player")
-        #update_player_container.rpc(Multiplayer.players_in_lobby)
+        update_player_container.rpc(Multiplayer.players_in_lobby)
+
 
 
 @rpc("any_peer", "call_local")
@@ -35,10 +36,10 @@ func update_player_container(Players_Data: Array):
     
     for kye in Players_Data:
         var scene_instantiated = scene_player_info.instantiate()
+        players_container.add_child(scene_instantiated)
         scene_instantiated.update_name(kye["name"])
         scene_instantiated.update_cards(2)
         scene_instantiated.update_moedas(2)
-        players_container.add_child(scene_instantiated)
         
 
 func on_renda_pressed() -> void:

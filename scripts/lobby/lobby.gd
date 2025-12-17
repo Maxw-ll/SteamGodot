@@ -90,7 +90,7 @@ func rpc_start_match() -> void:
 	if multiplayer.is_server():
 		await  get_tree().create_timer(0.1).timeout
 
-	get_tree().change_scene_to_file("res://scenes/spawner/spawner.tscn")
+	get_tree().change_scene_to_file("res://scenes/player/player_scene.tscn")
 
 ##################### ATUALIZAÇÃO DOS PLAYERS #####################
 func _refresh_players():

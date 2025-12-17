@@ -13,8 +13,8 @@ text = "Name_Player"
 
 [node name="cards" type="Label" parent="."]
 layout_mode = 2
-text = "Cards:"
+text = "Cards: "
 
 [node name="moedas" type="Label" parent="."]
 layout_mode = 2
-text = "Moedas:"
+text = "Moedas: "

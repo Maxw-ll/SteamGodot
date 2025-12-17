@@ -112,6 +112,7 @@ func _on_lobby_joined(this_lobby_id, _permissions, _locked, _response) -> void:
 
 	if is_host:
 		players_in_lobby.append({"steam_id": Steam.getSteamID(), "name": Steam.getPersonaName()})
+		Console.log("HOst foi Adicionado pelo joined")
 
 	emit_signal("lobby_joinedd")
 
@@ -120,7 +121,8 @@ func _on_data_update(_this_lobby_id: int, _changed_id: int, _making_change_id: i
 	Console.log("Players in Lobby : ")
 
 	for i in range(Steam.getNumLobbyMembers(lobby_id)):
-		var player_name: String = Steam.getFriendPersonaName(Steam.getLobbyMemberByIndex(lobby_id, i))
+		var player_steam_id = Steam.getLobbyMemberByIndex(lobby_id, i)
+		var player_name: String = Steam.getFriendPersonaName(player_steam_id)
 		Console.log(" - Player SteamID: " + player_name)
 		var players_exist: bool = false
 		for p in players_in_lobby:
@@ -129,7 +131,9 @@ func _on_data_update(_this_lobby_id: int, _changed_id: int, _making_change_id: i
 				break
 		
 		if not players_exist:
-			players_in_lobby.append({"steam_id": 0, "name": player_name})
+			players_in_lobby.append({"steam_id": player_steam_id, "name": player_name})
+			if player_steam_id == Steam.getSteamID():
+				Console.log("HOst foi Adicionado pelo Update")
 		
 
 	Console.log(str(players_in_lobby))
