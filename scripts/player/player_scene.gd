@@ -30,6 +30,8 @@ func _ready() -> void:
 
 @rpc("any_peer", "call_local")
 func update_player_container(Players_Data: Array):
+
+    Console.log(str(Multiplayer.players_in_lobby))
     
     for player in players_container.get_children():
         player.queue_free()
@@ -40,6 +42,9 @@ func update_player_container(Players_Data: Array):
         scene_instantiated.update_name(kye["name"])
         scene_instantiated.update_cards(2)
         scene_instantiated.update_moedas(2)
+    
+    Multiplayer.players_in_lobby = Players_Data
+    Console.log(str(Multiplayer.players_in_lobby))
         
 
 func on_renda_pressed() -> void:

@@ -88,7 +88,9 @@ func _on_lobby_created(success, this_lobby_id) -> void:
 	peer_id = multiplayer.get_unique_id()
 	is_host = true
 
-	
+	players_in_lobby.append({"steam_id": Steam.getSteamID(), "name": Steam.getPersonaName()})
+
+
 	#Emitir sinal Lobby criado!
 	emit_signal("lobby_createdd", room_code)
 
@@ -110,9 +112,7 @@ func _on_lobby_joined(this_lobby_id, _permissions, _locked, _response) -> void:
 	multiplayer.multiplayer_peer = peer
 	peer_id = multiplayer.get_unique_id()
 
-	if is_host:
-		players_in_lobby.append({"steam_id": Steam.getSteamID(), "name": Steam.getPersonaName()})
-		Console.log("HOst foi Adicionado pelo joined")
+
 
 	emit_signal("lobby_joinedd")
 
