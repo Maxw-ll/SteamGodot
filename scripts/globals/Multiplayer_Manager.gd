@@ -80,6 +80,7 @@ func _on_lobby_created(success, this_lobby_id) -> void:
 	Steam.setLobbyData(lobby_id, "room_code", room_code)
 	lobby_name = Steam.getLobbyData(lobby_id, "name")
 	Console.log("Lobby Nome e ID: " + lobby_name + " " + str(lobby_id))
+	Steam.setLobbyType(lobby_id, Steam.LOBBY_TYPE_PUBLIC)
 
 	#Criando o servidor [HOST]
 	var peer: MultiplayerPeer = SteamMultiplayerPeer.new()
