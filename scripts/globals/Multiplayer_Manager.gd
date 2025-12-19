@@ -191,3 +191,6 @@ func code_room_generator(length_code: int) -> String:
 		this_room_code += chars[index_random]
 	
 	return this_room_code
+
+
+

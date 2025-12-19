@@ -48,3 +48,12 @@ func update_player_container(Players_Data: Array):
 
 func  _on_action_pressed(action: String):
 	Console.log(action)
+	if action == "renda" and multiplayer.is_server():
+		back_to_the_lobby.rpc()
+
+
+@rpc("any_peer", "call_local", "reliable")
+func back_to_the_lobby():
+	
+	get_tree().change_scene_to_file("res://scenes/lobby/lobby.tscn")
+

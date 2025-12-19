@@ -17,12 +17,12 @@ func _ready() -> void:
 
 	if multiplayer.is_server():
 		start_button.visible = true
-		_refresh_players()
 
 	else:
 		ready_button.disabled = false
 		ready_button.visible = true
 	
+	_refresh_players()
 	multiplayer.peer_connected.connect(_on_peer_connected)
 	multiplayer.peer_disconnected.connect(_on_peer_disconnected)
 
