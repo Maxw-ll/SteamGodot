@@ -1,37 +1,63 @@
 extends Node
 
-var app_id: String = "480"
-var steam_id: int
-var steam_name: String
-
-signal steam_on
 
 func _ready() -> void:
-    var response: bool = conection_steam_initialize()
-    if response:
-        steam_name = Steam.getPersonaName()
-        steam_id = Steam.getSteamID()
+    multiplayer.connected_to_server.connect(_on_connected_to_the_server)
+    multiplayer.peer_disconnected.connect(_on_peer_disconnected)
 
-        emit_signal("steam_on")
+func _on_connected_to_the_server():
+    register_on_the_server.rpc_id(1, multiplayer.get_unique_id(), PlayerData.get_steam_id())
 
-#Conexão com a Steam
-func conection_steam_initialize() -> bool:
 
-    OS.set_environment("SteamAppId", app_id)
-    OS.set_environment("SteamGameId", app_id)
+func _on_peer_disconnected(this_peer_id: int):
+    GameState.set_player_peer_id_disconnected(this_peer_id)
 
-    var response_to_connect: Dictionary = Steam.steamInitEx()
 
-    if response_to_connect["status"] == 0:
-        Console.log("[STEAM CONECTADA]")
-        return true
+##################### FUNÇÕES ACESSIVEIS #####################
+func request_upate_ready_state(peer_id: int, state: bool) -> void:
+    rpc_update_ready_state.rpc_id(1, peer_id, state)
 
-    elif response_to_connect["status"] > 0:
-        Console.log("[color=red] [NÃO FOI POSSÍVEL SE CONECTAR À STEAM]")
+func request_start_game() -> void:
+    rpc_start_game.rpc()
+
+func request_back_to_the_lobby():
+    if multiplayer.is_server():
+        broadcast_back_to_the_lobby.rpc()
+
+##################### RPCS TO SERVER | CLIENTE -> SERVIDOR #####################
+@rpc("any_peer", "reliable")
+func register_on_the_server(this_peer_id: int, this_steam_id: int):
+
+    if not multiplayer.is_server():
+        Console.log("Não sou o servidor no NetManager")
     
-    return false
+    GameState.set_player_peer_id_connected(this_peer_id, this_steam_id)
 
-func _process(_delta: float) -> void:
-    Steam.run_callbacks()
+    new_player_registered_broadcast.rpc(GameState.players_in_lobby)
+
+@rpc("any_peer", "call_local", "reliable")
+func rpc_start_game():
+    get_tree().change_scene_to_file("res://scenes/player/player_scene.tscn")
 
 
+@rpc("any_peer", "reliable")
+func rpc_update_ready_state(this_peer_id: int, this_state: bool) -> void:
+    
+    GameState.set_player_ready_state(this_peer_id, this_state)
+    updated_ready_state_broadcast.rpc(this_peer_id, this_state)
+
+##################### RPCS TO CLIENT | SERVIDOR -> CLIENTE #####################
+    
+@rpc("any_peer", "reliable") 
+func new_player_registered_broadcast(game_state):
+    GameState.updated_from_network(game_state)
+
+@rpc("any_peer", "reliable")
+func updated_ready_state_broadcast(this_peer_id: int, this_state: bool):
+    GameState.set_player_ready_state(this_peer_id, this_state)
+
+@rpc("any_peer", "call_local", "reliable")
+func broadcast_back_to_the_lobby():
+    get_tree().change_scene_to_file("res://scenes/lobby/lobby.tscn")
+
+    

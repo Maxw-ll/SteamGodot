@@ -1,36 +1,20 @@
 extends Node
 
-
-#
-var is_host: bool = false
-var lobby_id: int
-var lobby_name: String
-var peer_id: int
-var room_code: String
-var room_code_length = 6
-var join_room_code: String
-var players_in_lobby: Array
-
 signal lobby_createdd(lobby_code: String)
 signal lobby_joinedd
-signal lobby_founded
 
 ##################### INICIALIZAÇÃO #####################
 func _ready() -> void:
 	randomize()
-	Network.connect("steam_on", Callable(self, "_on_steam_connect"))
 
-
-#Chamado após o acesso à Steam funcionar
-func _on_steam_connect() -> void:
 	Steam.connect("lobby_created", Callable(self, "_on_lobby_created"))
 	Steam.connect("lobby_joined", Callable(self, "_on_lobby_joined"))
 	Steam.connect("lobby_chat_update", Callable(self, "_on_data_update"))
 
-	lobby_founded.connect(join_lobby_founded)
 	Steam.lobby_match_list.connect(show_lobby_list)
 	
 	_open_lobby_list()
+
 
 ##################### LOBBY INFORMATIONS #####################
 func _open_lobby_list() -> void:
@@ -40,20 +24,21 @@ func _open_lobby_list() -> void:
 
 func search_room_code_in_lobby_list(lobbies) -> void:
 
-	for lb in lobbies:
-		var this_room_code: String = Steam.getLobbyData(lb, "room_code")
+	for lib in lobbies:
+		var this_room_code: String = Steam.getLobbyData(lib, "room_code")
 		if this_room_code != "":
-			if this_room_code == join_room_code:
-				lobby_id = lb
-				await get_tree().create_timer(0.5).timeout
-				emit_signal("lobby_founded")
+			if this_room_code == GameState.room_code:
+				GameState.lobby_id = lib
+				#await get_tree().create_timer(0.5).timeout
 				Console.log("SALA ENCONTRADA!")
+				Console.log("[Entrando no Lobby...]")
+				Console.log("Entrando no Lobby ID: " + str(GameState.lobby_id))
+				Steam.joinLobby(GameState.lobby_id)
 				return
 		
 	Console.log("SALA NÃO ENCONTRADA!")
 
 
-		
 func show_lobby_list(lobbies) -> void:
 
 	for lb in lobbies:
@@ -72,48 +57,45 @@ func _on_lobby_created(success, this_lobby_id) -> void:
 		Console.log("[color=red] Erro ao criar o Lobby!")
 		return
 
-	lobby_id = this_lobby_id
+	GameState.lobby_id = this_lobby_id
 	#Mudar o nome do Lobby
-	Steam.setLobbyData(lobby_id, "name", "Sabryna my Love, my Life")
-	var k_room_code = code_room_generator(room_code_length)
-	room_code = k_room_code
-	Steam.setLobbyData(lobby_id, "room_code", room_code)
-	lobby_name = Steam.getLobbyData(lobby_id, "name")
-	Console.log("Lobby Nome e ID: " + lobby_name + " " + str(lobby_id))
-	Steam.setLobbyType(lobby_id, Steam.LOBBY_TYPE_PUBLIC)
+	Steam.setLobbyData(GameState.lobby_id, "name", "Sabryna my Love, my Life")
+	GameState.room_code = code_room_generator()
+	
+	Steam.setLobbyData(GameState.lobby_id, "room_code", GameState.room_code)
+	GameState.lobby_name = Steam.getLobbyData(GameState.lobby_id, "name")
+	Console.log("Lobby Nome e ID: " + GameState.lobby_name + " " + str(GameState.lobby_id))
+	Steam.setLobbyType(GameState.lobby_id, Steam.LOBBY_TYPE_PUBLIC)
 
 	#Criando o servidor [HOST]
 	var peer: MultiplayerPeer = SteamMultiplayerPeer.new()
-	peer.host_with_lobby(lobby_id)
+	peer.host_with_lobby(GameState.lobby_id)
 	multiplayer.multiplayer_peer = peer
-	peer_id = multiplayer.get_unique_id()
-	is_host = true
+	GameState.peer_id = multiplayer.get_unique_id()
+	GameState.is_host = true
 
-	players_in_lobby.append({"steam_id": Steam.getSteamID(), "name": Steam.getPersonaName()})
-
+	GameState.players_in_lobby.append({"steam_id": PlayerData.get_steam_id(), "name": PlayerData.get_steam_name(), "ready": true, "peer_id": multiplayer.get_unique_id()})
 
 	#Emitir sinal Lobby criado!
-	emit_signal("lobby_createdd", room_code)
+	emit_signal("lobby_createdd", GameState.room_code)
 
 #Sinal Entrou no Lobby
 func _on_lobby_joined(this_lobby_id, _permissions, _locked, _response) -> void:
-	Console.log(Network.steam_name + " entrou no Lobby")
+	Console.log(PlayerData.get_steam_name() + " entrou no Lobby")
 	
 	#Se for o HOST não cria mais peer para ele
-	if is_host:
-		Console.log(str(Steam.getNumLobbyMembers(lobby_id)))
+	if GameState.is_host:
+		Console.log(str(Steam.getNumLobbyMembers(GameState.lobby_id)))
 		return
 	else:
-		lobby_id = this_lobby_id
+		GameState.lobby_id = this_lobby_id
+		GameState.lobby_name = Steam.getLobbyData(GameState.lobby_id, "name")
 		
-	
 	#Criando Peer Cliente e se concetando ao Host pelo Lobby
 	var peer: MultiplayerPeer = SteamMultiplayerPeer.new()
-	peer.connect_to_lobby(lobby_id)
+	peer.connect_to_lobby(GameState.lobby_id)
 	multiplayer.multiplayer_peer = peer
-	peer_id = multiplayer.get_unique_id()
-
-
+	GameState.peer_id = multiplayer.get_unique_id()
 
 	emit_signal("lobby_joinedd")
 
@@ -121,26 +103,25 @@ func _on_lobby_joined(this_lobby_id, _permissions, _locked, _response) -> void:
 func _on_data_update(_this_lobby_id: int, _changed_id: int, _making_change_id: int, _chat_state: int) -> void:
 	Console.log("Players in Lobby : ")
 
-	for i in range(Steam.getNumLobbyMembers(lobby_id)):
-		var player_steam_id = Steam.getLobbyMemberByIndex(lobby_id, i)
+	for i in range(Steam.getNumLobbyMembers(GameState.lobby_id)):
+		var player_steam_id = Steam.getLobbyMemberByIndex(GameState.lobby_id, i)
 		var player_name: String = Steam.getFriendPersonaName(player_steam_id)
 		Console.log(" - Player SteamID: " + player_name)
 		var players_exist: bool = false
-		for p in players_in_lobby:
+		for p in GameState.players_in_lobby:
 			if p["name"] == player_name:
 				players_exist = true
 				break
 		
 		if not players_exist:
-			players_in_lobby.append({"steam_id": player_steam_id, "name": player_name})
-			if player_steam_id == Steam.getSteamID():
-				Console.log("HOst foi Adicionado pelo Update")
-		
+			GameState.players_in_lobby.append({"steam_id": player_steam_id, "name": player_name, "ready": false, "peer_id": -1})
+			if player_steam_id == PlayerData.get_steam_id():
+				Console.log("Host foi Adicionado pelo Update")
+	
+	Console.log(str(GameState.players_in_lobby))
 
-	Console.log(str(players_in_lobby))
 
-
-##################### FUNCTIONS  #####################
+##################### FUNCTIONS #####################
 	
 #Create Lobby
 func create_lobby(max_players := 6) -> void:
@@ -148,30 +129,22 @@ func create_lobby(max_players := 6) -> void:
 	Steam.createLobby(Steam.LOBBY_TYPE_PUBLIC, max_players)
 
 #Join Lobby
-func join_lobby(this_lobby_room_code) -> void:
+func join_lobby(this_join_room_code) -> void:
 
 	Steam.lobby_match_list.connect(search_room_code_in_lobby_list)
 	Steam.lobby_match_list.disconnect(show_lobby_list)
 
-	Console.log(join_room_code)
-	join_room_code = this_lobby_room_code
-	Console.log(join_room_code)
+	Console.log(GameState.room_code)
+	GameState.room_code = this_join_room_code
+	Console.log(GameState.room_code)
 
 	_open_lobby_list()
 	#Vamos ter que procurar pelo lobby que tenha o mesmo código enviado!
 
-func join_lobby_founded() -> void:
-	Console.log("[Entrando no Lobby...]")
-	Console.log("Entrando no Lobby ID: " + str(lobby_id))
-	Steam.joinLobby(lobby_id)
-
-
-
 #Verify Friends -> Imprimir a Lista de Amigos
 func verifiy_friends() -> void:
 	Console.log("[color=green] " + str(Steam.getFriendCount(Steam.FRIEND_FLAG_IMMEDIATE)) + " amigos encontrados!")
-	var my_name: String = Steam.getPersonaName()
-	Console.log("My name is " + my_name)
+	Console.log("My name is " + PlayerData.get_steam_name())
 	Console.log("Amigos:")
 	
 	for i in range(0, Steam.getFriendCount(Steam.FRIEND_FLAG_IMMEDIATE)):
@@ -180,7 +153,7 @@ func verifiy_friends() -> void:
 		Console.log(friend_name)
 
 #Gerador Aleatório para os Códigos das Salas
-func code_room_generator(length_code: int) -> String:
+func code_room_generator(length_code: int = 6) -> String:
 
 	var this_room_code: String = ""
 
@@ -191,6 +164,3 @@ func code_room_generator(length_code: int) -> String:
 		this_room_code += chars[index_random]
 	
 	return this_room_code
-
-
-

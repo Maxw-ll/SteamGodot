@@ -5,10 +5,13 @@ extends Control
 @onready var players_list: VBoxContainer = $VBoxContainer
 
 var is_ready: bool = false
-var players_ready: Dictionary = {}
 
 ##################### INICIALIZAÇÃO #####################
 func _ready() -> void:
+
+	GameState.player_has_been_updated.connect(_refresh_players)
+	GameState.reset_players_ready_state()
+
 	start_button.visible = false
 	start_button.disabled = true
 
@@ -23,13 +26,7 @@ func _ready() -> void:
 		ready_button.visible = true
 	
 	_refresh_players()
-	multiplayer.peer_connected.connect(_on_peer_connected)
-	multiplayer.peer_disconnected.connect(_on_peer_disconnected)
-
 	
-
-	
-
 ##################### ESTILIZAÇÃO LABEL DOS NOMES #####################
 func make_label_style(label: Label) -> void:
 
@@ -52,15 +49,15 @@ func make_label_style(label: Label) -> void:
 func _process(_delta: float) -> void:
 	var all_players_ready: bool = true
 
-	if Array(multiplayer.get_peers()).is_empty():
+	if GameState.players_in_lobby.size() == 1:
 		all_players_ready = false
 
-	for pid in multiplayer.get_peers():
-		if not players_ready.get(pid, false):
+	for p in GameState.players_in_lobby:
+		if p["ready"] == false:
 			all_players_ready = false
 			break
 	
-	start_button.disabled = !all_players_ready
+	start_button.disabled = not all_players_ready
 
 
 ##################### READY #####################
@@ -68,50 +65,24 @@ func _on_ready_pressed() -> void:
 	is_ready = true
 	ready_button.disabled = true
 	ready_button.text = "Pronto!"
-	rpc_update_ready_state.rpc(multiplayer.get_unique_id(), is_ready)
+	Network.request_upate_ready_state(multiplayer.get_unique_id(), is_ready)
 
 ##################### START GAME #####################
 func _on_start_pressed() -> void:
 	Console.log("Jogando Começando..")
 	start_button.disabled = true
-	rpc_start_match.rpc()
+	Network.request_start_game()
 
-
-##################### RPCs #####################
-@rpc("any_peer", "reliable")
-func rpc_update_ready_state(peer_id: int, state: bool) -> void:
-	players_ready[peer_id] = state
-
-	_refresh_players()
-	Console.log(" Jogador %s está Pronto")
-
-@rpc("any_peer", "call_local", "reliable")
-func rpc_start_match() -> void:
-	if multiplayer.is_server():
-		await  get_tree().create_timer(0.1).timeout
-
-	get_tree().change_scene_to_file("res://scenes/player/player_scene.tscn")
 
 ##################### ATUALIZAÇÃO DOS PLAYERS #####################
 func _refresh_players():
 	for p in players_list.get_children():
 		p.queue_free()
-	
-	var all_players = [multiplayer.get_unique_id()]
-	all_players += Array(multiplayer.get_peers())
 
-	for pid in all_players:
+	for p in GameState.players_in_lobby:
 		var label_p = Label.new()
-		label_p.text = str(pid)
+		label_p.text = p["name"]
 		make_label_style(label_p)
 		players_list.add_child(label_p)
 
 ##################### EVENTOS DE CONEXÃO #####################
-func _on_peer_connected(id):
-	players_ready[id] = false
-	_refresh_players()
-
-
-func _on_peer_disconnected(id):
-	players_ready.erase(id)
-	_refresh_players()
