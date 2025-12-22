@@ -35,10 +35,10 @@ func update_ui_players_in_game():
 	for player in players_container.get_children():
 		player.queue_free()
 	
-	for p in GameState.players_in_lobby:
+	for key in GameState.players_in_lobby.keys():
 		var scene_instantiated = scene_player_info.instantiate()
 		players_container.add_child(scene_instantiated)
-		scene_instantiated.update_name(p["name"])
+		scene_instantiated.update_name(GameState.players_in_lobby[key]["steam_name"])
 		scene_instantiated.update_cards(2)
 		scene_instantiated.update_moedas(2)
 	

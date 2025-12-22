@@ -9,7 +9,7 @@ func _ready() -> void:
 
 	Steam.connect("lobby_created", Callable(self, "_on_lobby_created"))
 	Steam.connect("lobby_joined", Callable(self, "_on_lobby_joined"))
-	Steam.connect("lobby_chat_update", Callable(self, "_on_data_update"))
+	#Steam.connect("lobby_chat_update", Callable(self, "_on_data_update"))
 
 	Steam.lobby_match_list.connect(show_lobby_list)
 	
@@ -66,6 +66,7 @@ func _on_lobby_created(success, this_lobby_id) -> void:
 	GameState.lobby_name = Steam.getLobbyData(GameState.lobby_id, "name")
 	Console.log("Lobby Nome e ID: " + GameState.lobby_name + " " + str(GameState.lobby_id))
 	Steam.setLobbyType(GameState.lobby_id, Steam.LOBBY_TYPE_PUBLIC)
+	Steam.setLobbyJoinable(GameState.lobby_id, true)
 
 	#Criando o servidor [HOST]
 	var peer: MultiplayerPeer = SteamMultiplayerPeer.new()
@@ -74,8 +75,7 @@ func _on_lobby_created(success, this_lobby_id) -> void:
 	GameState.peer_id = multiplayer.get_unique_id()
 	GameState.is_host = true
 
-	GameState.players_in_lobby.append({"steam_id": PlayerData.get_steam_id(), "name": PlayerData.get_steam_name(), "ready": true, "peer_id": multiplayer.get_unique_id()})
-
+	GameState.add_player_in_lobby(multiplayer.get_unique_id(), PlayerData.get_steam_id(), PlayerData.get_steam_name(), true)
 	#Emitir sinal Lobby criado!
 	emit_signal("lobby_createdd", GameState.room_code)
 
@@ -99,26 +99,8 @@ func _on_lobby_joined(this_lobby_id, _permissions, _locked, _response) -> void:
 
 	emit_signal("lobby_joinedd")
 
-#Sinal Lobby Update (Quando Alguém entra ou sai do Lobby)
-func _on_data_update(_this_lobby_id: int, _changed_id: int, _making_change_id: int, _chat_state: int) -> void:
-	Console.log("Players in Lobby : ")
-
-	for i in range(Steam.getNumLobbyMembers(GameState.lobby_id)):
-		var player_steam_id = Steam.getLobbyMemberByIndex(GameState.lobby_id, i)
-		var player_name: String = Steam.getFriendPersonaName(player_steam_id)
-		Console.log(" - Player SteamID: " + player_name)
-		var players_exist: bool = false
-		for p in GameState.players_in_lobby:
-			if p["name"] == player_name:
-				players_exist = true
-				break
-		
-		if not players_exist:
-			GameState.players_in_lobby.append({"steam_id": player_steam_id, "name": player_name, "ready": false, "peer_id": -1})
-			if player_steam_id == PlayerData.get_steam_id():
-				Console.log("Host foi Adicionado pelo Update")
-	
-	Console.log(str(GameState.players_in_lobby))
+#Sinal Lobby Update (Quando Alguém entra ou sai do Lobby) 
+#WARNING: ESSA FUNÇÃO NÃO É MAIS USADA!
 
 
 ##################### FUNCTIONS #####################

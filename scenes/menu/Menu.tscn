@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://tki0e12u0q4q"]
 
-[ext_resource type="Script" uid="uid://brm0vbyb5llhm" path="res://scripts/menu/Menu.gd" id="1_kcc1k"]
+[ext_resource type="Script" uid="uid://ct72km8ibcxh1" path="res://scripts/menu/menu.gd" id="1_klgdb"]
 
 [node name="Control" type="Control"]
 layout_mode = 3
@@ -9,7 +9,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_kcc1k")
+script = ExtResource("1_klgdb")
 
 [node name="LineEdit" type="LineEdit" parent="."]
 layout_mode = 1

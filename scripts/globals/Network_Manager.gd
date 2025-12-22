@@ -6,7 +6,7 @@ func _ready() -> void:
     multiplayer.peer_disconnected.connect(_on_peer_disconnected)
 
 func _on_connected_to_the_server():
-    register_on_the_server.rpc_id(1, multiplayer.get_unique_id(), PlayerData.get_steam_id())
+    register_on_the_server.rpc_id(1, multiplayer.get_unique_id(), PlayerData.get_steam_id(), PlayerData.get_steam_name())
 
 
 func _on_peer_disconnected(this_peer_id: int):
@@ -26,12 +26,12 @@ func request_back_to_the_lobby():
 
 ##################### RPCS TO SERVER | CLIENTE -> SERVIDOR #####################
 @rpc("any_peer", "reliable")
-func register_on_the_server(this_peer_id: int, this_steam_id: int):
+func register_on_the_server(this_peer_id: int, this_steam_id: int, this_steam_name: String):
 
     if not multiplayer.is_server():
         Console.log("Não sou o servidor no NetManager")
     
-    GameState.set_player_peer_id_connected(this_peer_id, this_steam_id)
+    GameState.add_player_in_lobby(this_peer_id, this_steam_id, this_steam_name, false)
 
     new_player_registered_broadcast.rpc(GameState.players_in_lobby)
 
@@ -49,8 +49,8 @@ func rpc_update_ready_state(this_peer_id: int, this_state: bool) -> void:
 ##################### RPCS TO CLIENT | SERVIDOR -> CLIENTE #####################
     
 @rpc("any_peer", "reliable") 
-func new_player_registered_broadcast(game_state):
-    GameState.updated_from_network(game_state)
+func new_player_registered_broadcast(this_players_in_lobby):
+    GameState.updated_players_from_network(this_players_in_lobby)
 
 @rpc("any_peer", "reliable")
 func updated_ready_state_broadcast(this_peer_id: int, this_state: bool):
@@ -58,6 +58,7 @@ func updated_ready_state_broadcast(this_peer_id: int, this_state: bool):
 
 @rpc("any_peer", "call_local", "reliable")
 func broadcast_back_to_the_lobby():
+    GameState.reset_players_ready_state()
     get_tree().change_scene_to_file("res://scenes/lobby/lobby.tscn")
 
     

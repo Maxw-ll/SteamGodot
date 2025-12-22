@@ -9,8 +9,10 @@ var is_ready: bool = false
 ##################### INICIALIZAÇÃO #####################
 func _ready() -> void:
 
+	if GameState.is_host:
+		is_ready = true
+
 	GameState.player_has_been_updated.connect(_refresh_players)
-	GameState.reset_players_ready_state()
 
 	start_button.visible = false
 	start_button.disabled = true
@@ -52,12 +54,13 @@ func _process(_delta: float) -> void:
 	if GameState.players_in_lobby.size() == 1:
 		all_players_ready = false
 
-	for p in GameState.players_in_lobby:
-		if p["ready"] == false:
+	for this_peer_id in GameState.players_in_lobby.keys():
+		if GameState.players_in_lobby[this_peer_id]["ready"] == false:
 			all_players_ready = false
 			break
 	
 	start_button.disabled = not all_players_ready
+	
 
 
 ##################### READY #####################
@@ -79,10 +82,10 @@ func _refresh_players():
 	for p in players_list.get_children():
 		p.queue_free()
 
-	for p in GameState.players_in_lobby:
+	for this_peer_id in GameState.players_in_lobby.keys():
 		var label_p = Label.new()
-		label_p.text = p["name"]
+		label_p.text = GameState.players_in_lobby[this_peer_id]["steam_name"] + ": " + str(GameState.players_in_lobby[this_peer_id]["ready"])
 		make_label_style(label_p)
 		players_list.add_child(label_p)
-
+		
 ##################### EVENTOS DE CONEXÃO #####################
