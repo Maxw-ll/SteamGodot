@@ -9,9 +9,6 @@ var is_ready: bool = false
 ##################### INICIALIZAÇÃO #####################
 func _ready() -> void:
 
-	if GameState.is_host:
-		is_ready = true
-
 	GameState.player_has_been_updated.connect(_refresh_players)
 
 	start_button.visible = false
@@ -27,7 +24,7 @@ func _ready() -> void:
 		ready_button.disabled = false
 		ready_button.visible = true
 	
-	_refresh_players()
+	#_refresh_players()
 	
 ##################### ESTILIZAÇÃO LABEL DOS NOMES #####################
 func make_label_style(label: Label) -> void:

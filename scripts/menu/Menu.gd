@@ -34,10 +34,10 @@ func _on_join_pressed() -> void:
 	kill_inputs()
 
 #Qunando o Lobby foi criado!
-func on_loby_finished_created(this_lobby_code: String) -> void:
-	self.lobby_label.text += this_lobby_code
+func on_loby_finished_created() -> void:
+	self.lobby_label.text += GameState.room_code
 	self.lobby_label.visible = true
-	Console.log(this_lobby_code)
+	Console.log(GameState.room_code)
 	load_scene()
 
 #Quando entrar no Lobby carregar a cena

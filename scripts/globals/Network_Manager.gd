@@ -3,15 +3,18 @@ extends Node
 
 func _ready() -> void:
     multiplayer.connected_to_server.connect(_on_connected_to_the_server)
+    multiplayer.connection_failed.connect(_on_connection_to_the_server_failed)
     multiplayer.peer_disconnected.connect(_on_peer_disconnected)
 
 func _on_connected_to_the_server():
+    Console.log("Novo Cliente Conectado!")
     register_on_the_server.rpc_id(1, multiplayer.get_unique_id(), PlayerData.get_steam_id(), PlayerData.get_steam_name())
 
+func _on_connection_to_the_server_failed():
+    Console.log("ERRO ao se Conectar ao Servidor!")
 
 func _on_peer_disconnected(this_peer_id: int):
     GameState.set_player_peer_id_disconnected(this_peer_id)
-
 
 ##################### FUNÇÕES ACESSIVEIS #####################
 func request_upate_ready_state(peer_id: int, state: bool) -> void:

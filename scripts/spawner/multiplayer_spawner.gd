@@ -16,7 +16,7 @@ func _ready() -> void:
 
 func load_to_lobby():
 	for p in GameState.players_in_lobby:
-		spawn(p["peer_id"])
+		spawn(p)
 
 
 func _spawn_player(peer_id) -> CharacterBody2D:

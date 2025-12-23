@@ -1,6 +1,6 @@
 extends Node
 
-signal lobby_createdd(lobby_code: String)
+signal lobby_createdd
 signal lobby_joinedd
 
 ##################### INICIALIZAÇÃO #####################
@@ -9,7 +9,6 @@ func _ready() -> void:
 
 	Steam.connect("lobby_created", Callable(self, "_on_lobby_created"))
 	Steam.connect("lobby_joined", Callable(self, "_on_lobby_joined"))
-	#Steam.connect("lobby_chat_update", Callable(self, "_on_data_update"))
 
 	Steam.lobby_match_list.connect(show_lobby_list)
 	
@@ -67,17 +66,17 @@ func _on_lobby_created(success, this_lobby_id) -> void:
 	Steam.setLobbyData(GameState.lobby_id, "room_code", GameState.room_code)
 	GameState.lobby_name = Steam.getLobbyData(GameState.lobby_id, "name")
 	Console.log("Lobby Nome e ID: " + GameState.lobby_name + " " + str(GameState.lobby_id))
+	GameState.is_host = true
 
 	#Criando o servidor [HOST]
 	var peer: MultiplayerPeer = SteamMultiplayerPeer.new()
 	peer.host_with_lobby(GameState.lobby_id)
 	multiplayer.multiplayer_peer = peer
 	GameState.peer_id = multiplayer.get_unique_id()
-	GameState.is_host = true
-
 	GameState.add_player_in_lobby(multiplayer.get_unique_id(), PlayerData.get_steam_id(), PlayerData.get_steam_name(), true)
+
 	#Emitir sinal Lobby criado!
-	emit_signal("lobby_createdd", GameState.room_code)
+	emit_signal("lobby_createdd")
 
 #Sinal Entrou no Lobby
 func _on_lobby_joined(this_lobby_id, _permissions, _locked, _response) -> void:
@@ -90,18 +89,14 @@ func _on_lobby_joined(this_lobby_id, _permissions, _locked, _response) -> void:
 	else:
 		GameState.lobby_id = this_lobby_id
 		GameState.lobby_name = Steam.getLobbyData(GameState.lobby_id, "name")
-		
-	#Criando Peer Cliente e se concetando ao Host pelo Lobby
+	
+	#Criando Peer Cliente e se conectando ao Host pelo Lobby
 	var peer: MultiplayerPeer = SteamMultiplayerPeer.new()
 	peer.connect_to_lobby(GameState.lobby_id)
 	multiplayer.multiplayer_peer = peer
 	GameState.peer_id = multiplayer.get_unique_id()
-
+	
 	emit_signal("lobby_joinedd")
-
-#Sinal Lobby Update (Quando Alguém entra ou sai do Lobby) 
-#WARNING: ESSA FUNÇÃO NÃO É MAIS USADA!
-
 
 ##################### FUNCTIONS #####################
 	
