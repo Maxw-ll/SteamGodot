@@ -1,16 +1,23 @@
 extends Node
 
 enum {
-    WAINTING_PLAYERS,
+    WAITING_PLAYERS,
     TURN_START,
-    WAINTING_ACTION,
+    WAITING_ACTION,
     RESOLVING_ACTION,
-    TURN_ENG
+    TURN_END
 }
 
-var players_peer_order = []
-var state = WAINTING_PLAYERS
-var current_turn_index: int = 0
-var current_peer_id: int = -1
+
+func _ready() -> void:
+    pass
+
+func start_first_turn():
+    var peerd_ids_shuffled = GameState.players_in_lobby.keys()
+    peerd_ids_shuffled.shuffle()
+    GameState.set_new_turn_players_order(peerd_ids_shuffled)
+    Network.request_start_game()
+
+
 
 

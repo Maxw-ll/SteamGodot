@@ -21,7 +21,7 @@ func request_upate_ready_state(peer_id: int, state: bool) -> void:
     rpc_update_ready_state.rpc_id(1, peer_id, state)
 
 func request_start_game() -> void:
-    rpc_start_game.rpc()
+    rpc_start_game.rpc(GameState.players_peer_order)
 
 func request_back_to_the_lobby():
     if multiplayer.is_server():
@@ -36,10 +36,11 @@ func register_on_the_server(this_peer_id: int, this_steam_id: int, this_steam_na
     
     GameState.add_player_in_lobby(this_peer_id, this_steam_id, this_steam_name, false)
 
-    new_player_registered_broadcast.rpc(GameState.players_in_lobby)
+    new_player_registered_broadcast.rpc(GameState.players_in_lobby, this_steam_name)
 
 @rpc("any_peer", "call_local", "reliable")
-func rpc_start_game():
+func rpc_start_game(this_order_players):
+    GameState.players_peer_order = this_order_players.duplicate()
     get_tree().change_scene_to_file("res://scenes/player/player_scene.tscn")
 
 
@@ -52,7 +53,8 @@ func rpc_update_ready_state(this_peer_id: int, this_state: bool) -> void:
 ##################### RPCS TO CLIENT | SERVIDOR -> CLIENTE #####################
     
 @rpc("any_peer", "reliable") 
-func new_player_registered_broadcast(this_players_in_lobby):
+func new_player_registered_broadcast(this_players_in_lobby, this_steam_name):
+    Console.log(this_steam_name + " entrou no Lobby.")
     GameState.updated_players_from_network(this_players_in_lobby)
 
 @rpc("any_peer", "reliable")

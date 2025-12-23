@@ -24,7 +24,7 @@ func _ready() -> void:
 		ready_button.disabled = false
 		ready_button.visible = true
 	
-	#_refresh_players()
+	_refresh_players()
 	
 ##################### ESTILIZAÇÃO LABEL DOS NOMES #####################
 func make_label_style(label: Label) -> void:
@@ -71,9 +71,8 @@ func _on_ready_pressed() -> void:
 func _on_start_pressed() -> void:
 	Console.log("Jogando Começando..")
 	start_button.disabled = true
-	Network.request_start_game()
-
-
+	Turn.start_first_turn()
+	
 ##################### ATUALIZAÇÃO DOS PLAYERS #####################
 func _refresh_players():
 	for p in players_list.get_children():

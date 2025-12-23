@@ -1,6 +1,7 @@
 extends Node
 
 signal player_has_been_updated
+#signal order_players_has_been_updated
 
 #Player
 var is_host: bool = false
@@ -12,6 +13,10 @@ var room_code_length = 6
 var players_in_lobby: Dictionary
 
 #Turno
+var players_peer_order = []
+var state = Turn.WAITING_PLAYERS
+var current_turn_index: int = 0
+
 
 func _physics_process(_delta: float) -> void:
     #Console.log(str(GameState.players_in_lobby))
@@ -33,6 +38,7 @@ func set_player_ready_state(this_peer_id: int, this_state: bool):
 
 func set_player_peer_id_disconnected(this_peer_id: int):
     players_in_lobby.erase(this_peer_id)
+    players_peer_order.erase(this_peer_id)
     player_has_been_updated.emit()
 
 func reset_players_ready_state():
@@ -45,3 +51,6 @@ func reset_players_ready_state():
 
 ##################### FUNÇÕES TURNS UPDATES #####################
 
+func set_new_turn_players_order(order: Array) -> void:
+    players_peer_order = order.duplicate()
+    player_has_been_updated.emit()

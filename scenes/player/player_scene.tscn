@@ -74,3 +74,14 @@ text = "Tributario"
 [node name="troca_troca" type="Button" parent="VBoxContainer/acoes"]
 layout_mode = 2
 text = "Troca Troca"
+
+[node name="back_lobby" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = -507.0
+offset_top = -277.0
+offset_right = -341.0
+offset_bottom = -235.0
+grow_horizontal = 2
+text = "BACK TO THE LOBBY"

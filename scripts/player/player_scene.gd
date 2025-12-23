@@ -8,7 +8,8 @@ extends Control
 "roubar": $VBoxContainer/acoes/roubar,
 "assassinar": $VBoxContainer/acoes/assassinar,
 "tributario":  $VBoxContainer/acoes/tributario,
-"troca_troca": $VBoxContainer/acoes/troca_troca
+"troca_troca": $VBoxContainer/acoes/troca_troca,
+"back_to_the_lobby": $back_lobby
 }
 
 @onready var players_container: HBoxContainer = $VBoxContainer/players
@@ -16,7 +17,8 @@ extends Control
 
 
 func _ready() -> void:
-
+	
+	buttons_actions["back_to_the_lobby"].disabled = not GameState.is_host
 	GameState.player_has_been_updated.connect(update_ui_players_in_game)
 	
 	for action in buttons_actions:
@@ -35,17 +37,17 @@ func update_ui_players_in_game():
 	for player in players_container.get_children():
 		player.queue_free()
 	
-	for key in GameState.players_in_lobby.keys():
+	for peer_id in GameState.players_peer_order:
 		var scene_instantiated = scene_player_info.instantiate()
 		players_container.add_child(scene_instantiated)
-		scene_instantiated.update_name(GameState.players_in_lobby[key]["steam_name"])
+		scene_instantiated.update_name(GameState.players_in_lobby[peer_id]["steam_name"])
 		scene_instantiated.update_cards(2)
-		scene_instantiated.update_moedas(2)
+		scene_instantiated.update_moedas(2) 
 	
-	Console.log(str(GameState.players_in_lobby))
+	Console.log(str(GameState.players_peer_order))
 
 
 func  _on_action_pressed(action: String):
 	Console.log(action)
-	if action == "renda":
+	if action == "back_to_the_lobby":
 		Network.request_back_to_the_lobby()

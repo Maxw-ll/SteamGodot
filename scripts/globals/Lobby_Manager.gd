@@ -95,6 +95,7 @@ func _on_lobby_joined(this_lobby_id, _permissions, _locked, _response) -> void:
 	peer.connect_to_lobby(GameState.lobby_id)
 	multiplayer.multiplayer_peer = peer
 	GameState.peer_id = multiplayer.get_unique_id()
+	GameState.add_player_in_lobby(multiplayer.get_unique_id(), PlayerData.get_steam_id(), PlayerData.get_steam_name(), false)
 	
 	emit_signal("lobby_joinedd")
 
