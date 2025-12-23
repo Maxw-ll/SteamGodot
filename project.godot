@@ -25,6 +25,14 @@ Lobby="*res://scripts/globals/lobby_manager.gd"
 Network="*res://scripts/globals/network_manager.gd"
 Turn="*res://scripts/globals/turn_manager.gd"
 
+[gui]
+
+theme/default_font_antialiasing=0
+theme/default_font_hinting=0
+theme/default_font_subpixel_positioning=0
+theme/default_theme_scale=1.5
+theme/custom_font="uid://b4wwaenktebjo"
+
 [input]
 
 Enter={
