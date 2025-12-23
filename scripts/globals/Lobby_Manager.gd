@@ -19,6 +19,7 @@ func _ready() -> void:
 ##################### LOBBY INFORMATIONS #####################
 func _open_lobby_list() -> void:
 	Steam.addRequestLobbyListDistanceFilter(Steam.LOBBY_DISTANCE_FILTER_WORLDWIDE)
+	Steam.addRequestLobbyListStringFilter("game", "10", Steam.LOBBY_COMPARISON_EQUAL)
 	Steam.requestLobbyList()
 
 
@@ -60,13 +61,12 @@ func _on_lobby_created(success, this_lobby_id) -> void:
 	GameState.lobby_id = this_lobby_id
 	#Mudar o nome do Lobby
 	Steam.setLobbyData(GameState.lobby_id, "name", "Sabryna my Love, my Life")
+	Steam.setLobbyData(GameState.lobby_id, "game", "10")
 	GameState.room_code = code_room_generator()
 	
 	Steam.setLobbyData(GameState.lobby_id, "room_code", GameState.room_code)
 	GameState.lobby_name = Steam.getLobbyData(GameState.lobby_id, "name")
 	Console.log("Lobby Nome e ID: " + GameState.lobby_name + " " + str(GameState.lobby_id))
-	Steam.setLobbyType(GameState.lobby_id, Steam.LOBBY_TYPE_PUBLIC)
-	Steam.setLobbyJoinable(GameState.lobby_id, true)
 
 	#Criando o servidor [HOST]
 	var peer: MultiplayerPeer = SteamMultiplayerPeer.new()

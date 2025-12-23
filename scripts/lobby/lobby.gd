@@ -84,7 +84,7 @@ func _refresh_players():
 
 	for this_peer_id in GameState.players_in_lobby.keys():
 		var label_p = Label.new()
-		label_p.text = GameState.players_in_lobby[this_peer_id]["steam_name"] + ": " + str(GameState.players_in_lobby[this_peer_id]["ready"])
+		label_p.text = GameState.players_in_lobby[this_peer_id]["steam_name"]
 		make_label_style(label_p)
 		players_list.add_child(label_p)
 		
