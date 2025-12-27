@@ -1,8 +1,7 @@
 extends Node
 
 signal player_has_been_updated
-#signal order_players_has_been_updated
-
+signal turn_player_updated
 #Player
 var is_host: bool = false
 var lobby_id: int
@@ -14,43 +13,45 @@ var players_in_lobby: Dictionary
 
 #Turno
 var players_peer_order = []
+var number_players: int = 0
 var state = Turn.WAITING_PLAYERS
 var current_turn_index: int = 0
+var current_player_peer: int = -1
 
 
 func _physics_process(_delta: float) -> void:
-    #Console.log(str(GameState.players_in_lobby))
-    pass
+	pass
+	#Console.log(str(peer_id) + " " + str(GameState.players_in_lobby))
+	
 
 ##################### FUNÇÕES PLAYERS UPDATE #####################
 
 func add_player_in_lobby(this_peer_id, this_steam_id, this_steam_name, this_ready):
-    players_in_lobby[this_peer_id] = {"steam_id": this_steam_id, "steam_name": this_steam_name, "ready": this_ready}
-    player_has_been_updated.emit()
+	players_in_lobby[this_peer_id] = {"steam_id": this_steam_id, "steam_name": this_steam_name, "ready": this_ready, "number_cards": 2, "number_coins": 2}
+	player_has_been_updated.emit()
 
 func updated_players_from_network(this_players_in_lobby):
-    self.players_in_lobby = this_players_in_lobby
-    player_has_been_updated.emit()
+	self.players_in_lobby = this_players_in_lobby
+	player_has_been_updated.emit()
 
 func set_player_ready_state(this_peer_id: int, this_state: bool):
-    players_in_lobby[this_peer_id]["ready"] = this_state
-    player_has_been_updated.emit()
+	players_in_lobby[this_peer_id]["ready"] = this_state
+	player_has_been_updated.emit()
 
 func set_player_peer_id_disconnected(this_peer_id: int):
-    players_in_lobby.erase(this_peer_id)
-    players_peer_order.erase(this_peer_id)
-    player_has_been_updated.emit()
+	players_in_lobby.erase(this_peer_id)
+	players_peer_order.erase(this_peer_id)
+	player_has_been_updated.emit()
+
+func add_player_coins(peer_player, number_to_add):
+	players_in_lobby[peer_player]["number_coins"] += number_to_add
+	player_has_been_updated.emit()
 
 func reset_players_ready_state():
-    for this_peer_id in players_in_lobby.keys():
-        if this_peer_id == 1:
-            players_in_lobby[this_peer_id]["ready"] = true
-        else:
-            players_in_lobby[this_peer_id]["ready"] = false
-
-
-##################### FUNÇÕES TURNS UPDATES #####################
-
-func set_new_turn_players_order(order: Array) -> void:
-    players_peer_order = order.duplicate()
-    player_has_been_updated.emit()
+	for this_peer_id in players_in_lobby.keys():
+		players_in_lobby[this_peer_id]["number_cards"] = 2
+		players_in_lobby[this_peer_id]["number_coins"] = 2
+		if this_peer_id == 1:
+			players_in_lobby[this_peer_id]["ready"] = true
+		else:
+			players_in_lobby[this_peer_id]["ready"] = false

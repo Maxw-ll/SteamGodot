@@ -2,6 +2,11 @@ extends Node
 
 signal lobby_createdd
 signal lobby_joinedd
+signal host_created(status: bool)
+
+var number_to_try_connect_host: int = 6
+var  connected_with_local_network = false
+var  connected_with_global_network = false
 
 ##################### INICIALIZAÇÃO #####################
 func _ready() -> void:
@@ -70,13 +75,25 @@ func _on_lobby_created(success, this_lobby_id) -> void:
 
 	#Criando o servidor [HOST]
 	var peer: MultiplayerPeer = SteamMultiplayerPeer.new()
-	peer.host_with_lobby(GameState.lobby_id)
-	multiplayer.multiplayer_peer = peer
-	GameState.peer_id = multiplayer.get_unique_id()
-	GameState.add_player_in_lobby(multiplayer.get_unique_id(), PlayerData.get_steam_id(), PlayerData.get_steam_name(), true)
+	peer.server_relay = true
+	var response = -1
+	for i in range(number_to_try_connect_host):
+		response = peer.host_with_lobby(GameState.lobby_id)
+		if response == OK:
+			Console.log("HOST CRIADO COM SUCESSO! Tentativa: %s" % [i+1])
+			break
+	
+	if response != OK:
+		Console.log("Não foi possível Conectar o HOST")
+		host_created.emit(false)
+	else:
 
-	#Emitir sinal Lobby criado!
-	emit_signal("lobby_createdd")
+		multiplayer.multiplayer_peer = peer
+		GameState.peer_id = multiplayer.get_unique_id()
+		GameState.add_player_in_lobby(multiplayer.get_unique_id(), PlayerData.get_steam_id(), PlayerData.get_steam_name(), true)
+
+		#Emitir sinal Lobby criado!
+		lobby_createdd.emit()
 
 #Sinal Entrou no Lobby
 func _on_lobby_joined(this_lobby_id, _permissions, _locked, _response) -> void:
@@ -97,7 +114,7 @@ func _on_lobby_joined(this_lobby_id, _permissions, _locked, _response) -> void:
 	GameState.peer_id = multiplayer.get_unique_id()
 	GameState.add_player_in_lobby(multiplayer.get_unique_id(), PlayerData.get_steam_id(), PlayerData.get_steam_name(), false)
 	
-	emit_signal("lobby_joinedd")
+	lobby_joinedd.emit()
 
 ##################### FUNCTIONS #####################
 	
@@ -112,10 +129,8 @@ func join_lobby(this_join_room_code) -> void:
 	Steam.lobby_match_list.connect(search_room_code_in_lobby_list)
 	Steam.lobby_match_list.disconnect(show_lobby_list)
 
-	Console.log(GameState.room_code)
 	GameState.room_code = this_join_room_code
-	Console.log(GameState.room_code)
-
+	
 	_open_lobby_list()
 	#Vamos ter que procurar pelo lobby que tenha o mesmo código enviado!
 
@@ -142,3 +157,24 @@ func code_room_generator(length_code: int = 6) -> String:
 		this_room_code += chars[index_random]
 	
 	return this_room_code
+
+
+##################### LOCAL LOBBY FUNCTIONS #####################
+func create_local_lobby():
+	var peer = ENetMultiplayerPeer.new()
+	peer.create_server(8061, 5)
+	GameState.is_host = true
+	multiplayer.multiplayer_peer = peer
+	GameState.peer_id = multiplayer.get_unique_id()
+	GameState.add_player_in_lobby(multiplayer.get_unique_id(), PlayerData.get_steam_id(), PlayerData.get_steam_name(), true)
+	lobby_createdd.emit()
+	
+
+func connect_local_lobby():
+	var peer = ENetMultiplayerPeer.new()
+	peer.create_client("127.0.0.1", 8061)
+	multiplayer.multiplayer_peer = peer
+	GameState.peer_id = multiplayer.get_unique_id()
+	GameState.add_player_in_lobby(multiplayer.get_unique_id(), PlayerData.get_steam_id(), PlayerData.get_steam_name(), false)
+	lobby_joinedd.emit()
+	

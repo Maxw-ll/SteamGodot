@@ -1,0 +1,61 @@
+[gd_scene load_steps=4 format=3 uid="uid://c1h0jwvlg1411"]
+
+[ext_resource type="Script" uid="uid://daq1150maqj5v" path="res://scripts/menu/main_menu.gd" id="1_nl8w3"]
+
+[sub_resource type="CanvasTexture" id="CanvasTexture_70654"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_nl8w3"]
+font_size = 200
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_nl8w3")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+modulate = Color(0.20494595, 0.366049, 0.66595757, 1)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("CanvasTexture_70654")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 0
+offset_left = 402.0
+offset_top = 38.0
+offset_right = 745.0
+offset_bottom = 253.0
+text = "COUP"
+label_settings = SubResource("LabelSettings_nl8w3")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -78.5
+offset_top = -42.0
+offset_right = 78.5
+offset_bottom = 42.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="WAN" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Multiplayer Global"
+
+[node name="LAN" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Multiplayer Local"
+
+[connection signal="pressed" from="VBoxContainer/WAN" to="." method="_on_wan_pressed"]
+[connection signal="pressed" from="VBoxContainer/LAN" to="." method="_on_lan_pressed"]
