@@ -63,7 +63,6 @@ func update_ui_players_in_game():
 		var scene_instantiated = scene_player_info.instantiate()
 		players_container.add_child(scene_instantiated)
 		scene_instantiated.update_name(GameState.players_in_lobby[peer_id]["steam_name"])
-		scene_instantiated.update_cards(GameState.players_in_lobby[peer_id]["number_cards"])
 		scene_instantiated.update_moedas(GameState.players_in_lobby[peer_id]["number_coins"])
 	
 	Console.log(str(GameState.players_peer_order))

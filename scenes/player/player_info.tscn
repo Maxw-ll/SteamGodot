@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://csr0j714nr1qv"]
+[gd_scene load_steps=3 format=3 uid="uid://csr0j714nr1qv"]
 
 [ext_resource type="Script" uid="uid://cc10o786gu80l" path="res://scripts/player/player_info.gd" id="1_sip43"]
+[ext_resource type="Texture2D" uid="uid://crn6ssi6mssgu" path="res://assets/card_back.png" id="2_xek07"]
 
 [node name="player_info" type="VBoxContainer"]
 offset_right = 40.0
@@ -11,10 +12,18 @@ script = ExtResource("1_sip43")
 layout_mode = 2
 text = "Name_Player"
 
-[node name="cards" type="Label" parent="."]
-layout_mode = 2
-text = "Cards: "
-
 [node name="moedas" type="Label" parent="."]
 layout_mode = 2
 text = "Moedas: "
+
+[node name="cards" type="HBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="c1" type="TextureRect" parent="cards"]
+layout_mode = 2
+texture = ExtResource("2_xek07")
+
+[node name="c2" type="TextureRect" parent="cards"]
+layout_mode = 2
+texture = ExtResource("2_xek07")
