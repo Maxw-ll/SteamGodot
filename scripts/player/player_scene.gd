@@ -15,13 +15,18 @@ extends Control
 @onready var players_container: HBoxContainer = $VBoxContainer/players
 @onready var scene_player_info: PackedScene = preload("res://scenes/player/player_info.tscn")
 @onready var all_buttons_actions_container: HBoxContainer = $VBoxContainer/acoes
+@onready var label_card_1: Label = $VBoxContainer/cards/card_1
+@onready var label_card_2: Label = $VBoxContainer/cards/card_2
 
 
 func _ready() -> void:
-	
+
 	buttons_actions["back_to_the_lobby"].disabled = not GameState.is_host
 	GameState.player_has_been_updated.connect(update_ui_players_in_game)
 	GameState.turn_player_updated.connect(update_ui_actions_in_game)
+
+	label_card_1.text = PlayerData.cards[0]
+	label_card_2.text = PlayerData.cards[1]
 	
 	for action in buttons_actions:
 		buttons_actions[action].pressed.connect(Callable(self, "_on_action_pressed").bind(action))

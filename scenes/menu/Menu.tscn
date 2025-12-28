@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://tki0e12u0q4q"]
+[gd_scene load_steps=2 format=3 uid="uid://seavv1mduxdp"]
 
 [ext_resource type="Script" uid="uid://ct72km8ibcxh1" path="res://scripts/menu/menu.gd" id="1_klgdb"]
 
@@ -68,7 +68,8 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = -257.0
-offset_top = -39.0
+offset_top = -31.0
+offset_bottom = 8.0
 grow_horizontal = 0
 grow_vertical = 0
 text = "LOBBY: "

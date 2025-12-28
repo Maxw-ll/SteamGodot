@@ -1,11 +1,8 @@
 extends Node
 
 enum {
-	WAITING_PLAYERS,
-	TURN_START,
 	WAITING_ACTION,
-	RESOLVING_ACTION,
-	TURN_END
+	RESOLVING_ACTION
 }
 
 
@@ -18,7 +15,6 @@ func start_first_turn():
 	peerd_ids_shuffled.shuffle()
 	GameState.players_peer_order = peerd_ids_shuffled.duplicate()
 	GameState.turn_player_updated.emit()
-	Network.request_start_game()
 
 func _set_current_player_peer():
 	GameState.number_players = GameState.players_peer_order.size()

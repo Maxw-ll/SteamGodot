@@ -25,6 +25,7 @@ Lobby="*res://scripts/globals/lobby_manager.gd"
 Network="*res://scripts/globals/network_manager.gd"
 Turn="*res://scripts/globals/turn_manager.gd"
 Action="*res://scripts/globals/action_manager.gd"
+Cards="*res://scripts/globals/card_manager.gd"
 
 [gui]
 

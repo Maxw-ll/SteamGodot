@@ -33,7 +33,20 @@ func request_update_player_coins(peer_player, coins):
 		rpc_update_player_coins(peer_player, coins)
 	else:
 		rpc_update_player_coins.rpc_id(1, peer_player, coins)
-	
+
+func request_distribute_cards():
+	if GameState.is_host:
+		for peer in GameState.players_peer_order:
+			for i in range(2):
+				var  card = Cards.pop_card()
+				if peer == 1:
+					send_card_to_player(card)
+				else:
+					send_card_to_player.rpc_id(peer, card)
+
+	request_start_game()
+	Console.log(str(Cards.deck))
+			
 func request_next_turn_player():
 	if multiplayer.is_server():
 		broadcast_next_turn_player.rpc()
@@ -89,3 +102,7 @@ func broadcast_next_turn_player():
 func broadcast_update_player_coins(peer_player, coins_to_add):
 	GameState.add_player_coins(peer_player,  coins_to_add)
 	request_next_turn_player()
+
+@rpc("any_peer", "reliable")
+func send_card_to_player(card):
+	PlayerData.set_new_card(card)

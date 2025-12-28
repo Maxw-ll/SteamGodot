@@ -71,7 +71,9 @@ func _on_ready_pressed() -> void:
 func _on_start_pressed() -> void:
 	Console.log("Jogando Começando..")
 	start_button.disabled = true
+	Cards.create_shuffled_deck()
 	Turn.start_first_turn()
+	Network.request_distribute_cards()
 	
 ##################### ATUALIZAÇÃO DOS PLAYERS #####################
 func _refresh_players():

@@ -14,7 +14,6 @@ var players_in_lobby: Dictionary
 #Turno
 var players_peer_order = []
 var number_players: int = 0
-var state = Turn.WAITING_PLAYERS
 var current_turn_index: int = 0
 var current_player_peer: int = -1
 
@@ -48,6 +47,9 @@ func add_player_coins(peer_player, number_to_add):
 	player_has_been_updated.emit()
 
 func reset_players_ready_state():
+	PlayerData.cards.clear()
+	Cards.deck.clear()
+	GameState.current_turn_index = 0
 	for this_peer_id in players_in_lobby.keys():
 		players_in_lobby[this_peer_id]["number_cards"] = 2
 		players_in_lobby[this_peer_id]["number_coins"] = 2
