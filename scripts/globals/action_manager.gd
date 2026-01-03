@@ -27,7 +27,9 @@ func _handle_renda(peer_id):
 
 func _handle_coup(_sended_pid, _target_pid):
 
-	pass
+	GameState.players_in_lobby[_sended_pid]["number_coins"] -= 7
+
+	_end_action()
  
 func _end_action():
 	Network.broadcast_sync_game_state.rpc(GameState.players_in_lobby)

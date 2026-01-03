@@ -35,6 +35,12 @@ func _ready() -> void:
 	label_card_2.text = PlayerData.cards[1]
 	
 	for action in buttons_actions:
+		match action:
+			"assassinar":
+				buttons_actions[action].disabled = true
+			"coup":
+				buttons_actions[action].disabled = true
+
 		buttons_actions[action].pressed.connect(Callable(self, "_on_action_pressed").bind(action))
 	
 	all_buttons_actions_container.visible = false
@@ -57,6 +63,22 @@ func update_ui_actions_in_game():
 		all_buttons_actions_container.visible = true
 	else:
 		all_buttons_actions_container.visible = false
+
+	if GameState.players_in_lobby[GameState.peer_id]["number_coins"] >= 3:
+		buttons_actions["assassinar"].disabled = false
+	else:
+		buttons_actions["assassinar"].disabled = true
+
+
+	if GameState.players_in_lobby[GameState.peer_id]["number_coins"] >= 7:
+		buttons_actions["coup"].disabled = false
+	else:
+		buttons_actions["coup"].disabled = true
+
+		
+	
+
+
 
 func update_ui_target_players_button():
 	target_players_container.visible = true
@@ -102,5 +124,7 @@ func  _on_action_pressed(action: String):
 		Network.request_back_to_the_lobby()
 	else:
 		if action == "renda":
+			Network.request_action(action, 0)
+		if action == "coup":
 			_action = action
 			request_target_player.emit()
