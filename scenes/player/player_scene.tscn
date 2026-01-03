@@ -75,6 +75,11 @@ text = "Tributario"
 layout_mode = 2
 text = "Troca Troca"
 
+[node name="players_target" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 3
+
 [node name="back_lobby" type="Button" parent="."]
 layout_mode = 1
 anchors_preset = 10

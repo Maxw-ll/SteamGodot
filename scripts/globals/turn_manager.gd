@@ -30,3 +30,7 @@ func set_new_turn_players_order(order: Array) -> void:
 	GameState.number_players = order.size()
 	_set_current_player_peer()
 	GameState.player_has_been_updated.emit()
+
+func is_current_player(peer_id):
+
+	return peer_id == GameState.current_player_peer

@@ -28,11 +28,11 @@ func request_back_to_the_lobby():
 	if multiplayer.is_server():
 		broadcast_back_to_the_lobby.rpc()
 
-func request_update_player_coins(peer_player, coins):
+func request_action(action, target_peer_id):
 	if GameState.is_host:
-		rpc_update_player_coins(peer_player, coins)
+		Action.handle_action_requested(1, action, target_peer_id)
 	else:
-		rpc_update_player_coins.rpc_id(1, peer_player, coins)
+		rpc_request_action.rpc_id(1, action, target_peer_id)
 
 func request_distribute_cards():
 	if GameState.is_host:
@@ -47,15 +47,8 @@ func request_distribute_cards():
 	request_start_game()
 	Console.log(str(Cards.deck))
 			
-func request_next_turn_player():
-	if multiplayer.is_server():
-		broadcast_next_turn_player.rpc()
 
 ##################### RPCS TO SERVER | CLIENTE -> SERVIDOR #####################
-@rpc("any_peer", "reliable")
-func rpc_update_player_coins(peer_id, coins):
-	broadcast_update_player_coins.rpc(peer_id, coins)
-
 @rpc("any_peer", "reliable")
 func register_on_the_server(this_peer_id: int, this_steam_id: int, this_steam_name: String):
 
@@ -78,8 +71,18 @@ func rpc_update_ready_state(this_peer_id: int, this_state: bool) -> void:
 	GameState.set_player_ready_state(this_peer_id, this_state)
 	updated_ready_state_broadcast.rpc(this_peer_id, this_state)
 
+@rpc("any_peer", "reliable")
+func rpc_request_action(action, target_peer_id):
+	var sender_pid = multiplayer.get_remote_sender_id()
+	Action.handle_action_requested(sender_pid, action, target_peer_id)
+
+
 ##################### RPCS TO CLIENT | SERVIDOR -> CLIENTE #####################
-	
+@rpc("any_peer", "call_local", "reliable")
+func broadcast_sync_game_state(geral_state):
+	GameState.updated_players_from_network(geral_state)
+
+
 @rpc("any_peer", "reliable") 
 func new_player_registered_broadcast(this_players_in_lobby, this_steam_name):
 	Console.log(this_steam_name + " entrou no Lobby.")
@@ -97,11 +100,6 @@ func broadcast_back_to_the_lobby():
 @rpc("any_peer", "call_local", "reliable")
 func broadcast_next_turn_player():
 	Turn.next_turn()
-
-@rpc("any_peer", "call_local", "reliable")
-func broadcast_update_player_coins(peer_player, coins_to_add):
-	GameState.add_player_coins(peer_player,  coins_to_add)
-	request_next_turn_player()
 
 @rpc("any_peer", "reliable")
 func send_card_to_player(card):

@@ -2,6 +2,7 @@ extends Node
 
 signal player_has_been_updated
 signal turn_player_updated
+
 #Player
 var is_host: bool = false
 var lobby_id: int
@@ -40,10 +41,6 @@ func set_player_ready_state(this_peer_id: int, this_state: bool):
 func set_player_peer_id_disconnected(this_peer_id: int):
 	players_in_lobby.erase(this_peer_id)
 	players_peer_order.erase(this_peer_id)
-	player_has_been_updated.emit()
-
-func add_player_coins(peer_player, number_to_add):
-	players_in_lobby[peer_player]["number_coins"] += number_to_add
 	player_has_been_updated.emit()
 
 func reset_players_ready_state():
